@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "#############################################################################"
 echo "#                Pacman Fastboot ROM Flasher                                #"
