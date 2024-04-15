@@ -28,47 +28,42 @@ logical_partitions="odm vendor system_ext system"
 vbmeta_partitions="vbmeta_system vbmeta_vendor"
 
 function SetActiveSlot {
-    $fastboot --set-active=a
-    if [ $? -ne 0 ]; then
+    if ! $fastboot --set-active=a; then
         echo "Error occured while switching to slot A. Aborting"
         exit 1
     fi
 }
 
 function handle_fastboot_error {
-    if [ ! $FASTBOOT_ERROR = "n" ] || [ ! $FASTBOOT_ERROR = "N" ] || [ ! $FASTBOOT_ERROR = "" ]; then
+    if [ ! "$FASTBOOT_ERROR" = "n" ] || [ ! "$FASTBOOT_ERROR" = "N" ] || [ ! "$FASTBOOT_ERROR" = "" ]; then
        exit 1
     fi  
 }
 
 function ErasePartition {
-    $fastboot erase $1
-    if [ $? -ne 0 ]; then
-        read -p "Erasing $1 partition failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
+    if ! $fastboot erase "$1"; then
+        read -rp "Erasing $1 partition failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
         handle_fastboot_error
     fi
 }
 
 function FlashImage {
-    $fastboot flash $1 $2
-    if [ $? -ne 0 ]; then
-        read -p "Flashing$2 failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
+    if ! $fastboot flash "$1" "$2"; then
+        read -rp "Flashing$2 failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
         handle_fastboot_error
     fi
 }
 
 function DeleteLogicalPartition {
-    $fastboot delete-logical-partition $1
-    if [ $? -ne 0 ]; then
-        read -p "Deleting $1 partition failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
+    if ! $fastboot delete-logical-partition "$1"; then
+        read -rp "Deleting $1 partition failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
         handle_fastboot_error
     fi
 }
 
 function CreateLogicalPartition {
-    $fastboot create-logical-partition $1 $2
-    if [ $? -ne 0 ]; then
-        read -p "Creating $1 partition failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
+    if ! $fastboot create-logical-partition "$1" "$2"; then
+        read -rp "Creating $1 partition failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
         handle_fastboot_error
     fi
 }
@@ -84,8 +79,7 @@ function ResizeLogicalPartition {
 }
 
 function WipeSuperPartition {
-    $fastboot wipe-super super_empty.img
-    if [ $? -ne 0 ]; then 
+    if ! $fastboot wipe-super super_empty.img; then 
         echo "Wiping super partition failed. Fallback to deleting and creating logical partitions"
         ResizeLogicalPartition
     fi
@@ -98,7 +92,7 @@ echo "#############################"
 $fastboot devices
 
 ACTIVE_SLOT=$($fastboot getvar current-slot 2>&1 | awk 'NR==1{print $2}')
-if [ ! $ACTIVE_SLOT = "waiting" ] && [ ! $ACTIVE_SLOT = "a" ]; then
+if [ ! "$ACTIVE_SLOT" = "waiting" ] && [ ! "$ACTIVE_SLOT" = "a" ]; then
     echo "#############################"
     echo "# CHANGING ACTIVE SLOT TO A #"
     echo "#############################"
@@ -108,7 +102,7 @@ fi
 echo "###################"
 echo "# FORMATTING DATA #"
 echo "###################"
-read -p "Wipe Data? (Y/N) " DATA_RESP
+read -rp "Wipe Data? (Y/N) " DATA_RESP
 case $DATA_RESP in
     [yY] )
         echo 'Please ignore "Did you mean to format this partition?" warnings.'
@@ -120,7 +114,7 @@ esac
 echo "############################"
 echo "# FLASHING BOOT PARTITIONS #"
 echo "############################"
-read -p "Flash images on both slots? If unsure, say N. (Y/N) " SLOT_RESP
+read -rp "Flash images on both slots? If unsure, say N. (Y/N) " SLOT_RESP
 case $SLOT_RESP in
     [yY] )
         SLOT="--slot=all"
@@ -145,8 +139,7 @@ fi
 echo "##########################"             
 echo "# REBOOTING TO FASTBOOTD #"       
 echo "##########################"
-$fastboot reboot fastboot
-if [ $? -ne 0 ]; then
+if ! $fastboot reboot fastboot; then
     echo "Error occured while rebooting to fastbootd. Aborting"
     exit 1
 fi
@@ -161,7 +154,7 @@ done
 echo "###################"
 echo "# FLASHING VBMETA #"
 echo "###################"
-read -p "Disable android verified boot?, If unsure, say N. Bootloader won't be lockable if you select Y. (Y/N) " VBMETA_RESP
+read -rp "Disable android verified boot?, If unsure, say N. Bootloader won't be lockable if you select Y. (Y/N) " VBMETA_RESP
 case $VBMETA_RESP in
     [yY] )
         FlashImage "$SLOT vbmeta --disable-verity --disable-verification" \ "vbmeta.img"
@@ -176,7 +169,7 @@ echo "# FLASHING LOGICAL PARTITIONS #"
 echo "###############################"
 echo "Flash logical partition images?"
 echo "If you're about to install a custom ROM that distributes its own logical partitions, say N."
-read -p "If unsure, say Y. (Y/N) " LOGICAL_RESP
+read -rp "If unsure, say Y. (Y/N) " LOGICAL_RESP
 case $LOGICAL_RESP in
     [yY] )
         if [ ! -f super.img ]; then
@@ -211,7 +204,7 @@ done
 echo "#############"
 echo "# REBOOTING #"
 echo "#############"
-read -p "Reboot to system? If unsure, say Y. (Y/N) " REBOOT_RESP
+read -rp "Reboot to system? If unsure, say Y. (Y/N) " REBOOT_RESP
 case $REBOOT_RESP in
     [yY] )
         $fastboot reboot
