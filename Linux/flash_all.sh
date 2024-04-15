@@ -9,12 +9,12 @@ echo "##########################################################################
 
 ##----------------------------------------------------------##
 if [ ! -d platform-tools ]; then
-    wget https://dl.google.com/android/repository/platform-tools-latest-linux.zip -O platform-tools-latest.zip
-    unzip platform-tools-latest.zip
-    rm platform-tools-latest.zip
+    wget https://dl.google.com/android/repository/platform-tools-latest-linux.zip -O ${PWD}/platform-tools-latest.zip
+    unzip ${PWD}/platform-tools-latest.zip
+    rm ${PWD}/platform-tools-latest.zip
 fi
 
-fastboot=platform-tools/fastboot
+fastboot=${PWD}/platform-tools/fastboot
 
 if [ ! -f $fastboot ] || [ ! -x $fastboot ]; then
     echo "Fastboot cannot be executed, exiting"
