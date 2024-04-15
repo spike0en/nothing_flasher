@@ -1,12 +1,12 @@
 @echo off
-title Nothing Phone 2 Fastboot ROM Flasher (t.me/NothingPhone2)
+title Nothing Phone 2a Fastboot ROM Flasher (t.me/NothingPhone2a)
 
-echo ###########################################################
-echo #                Pong Fastboot ROM Flasher                #
-echo #                   Developed/Tested By                   #
-echo #  HELLBOY017, viralbanda, spike0en, PHATwalrus, arter97  #
-echo #          [Nothing Phone (2) Telegram Dev Team]          #
-echo ###########################################################
+echo #############################################################################
+echo #                Pacman Fastboot ROM Flasher                                #
+echo #                   Developed/Tested By                                     #
+echo #  HELLBOY017, viralbanda, spike0en, PHATwalrus, arter97, AntoninoScordino  #
+echo #          [Nothing Phone (2a) Telegram Dev Team]                           #
+echo #############################################################################
 
 cd %~dp0
 
@@ -23,9 +23,9 @@ if not exist %fastboot% (
     exit
 )
 
-set boot_partitions=boot vendor_boot dtbo recovery
-set firmware_partitions=abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump
-set logical_partitions=system system_ext product vendor vendor_dlkm odm
+set boot_partitions=boot dtbo init_boot vendor_boot vendor_dlkm odm_dlkm system_dlkm
+set firmware_partitions=apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img preloader_raw scp spmfw sspm tee vcp
+set logical_partitions=odm vendor system_ext system
 set vbmeta_partitions=vbmeta_system vbmeta_vendor
 
 echo #############################
