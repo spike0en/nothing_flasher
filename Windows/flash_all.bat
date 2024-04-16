@@ -23,7 +23,7 @@ if not exist %fastboot% (
     exit
 )
 
-set boot_partitions=boot dtbo init_boot vendor_boot vendor_dlkm odm_dlkm system_dlkm
+set boot_partitions=boot dtbo init_boot vendor_boot
 set firmware_partitions=apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img preloader_raw scp spmfw sspm tee vcp
 set logical_partitions=odm vendor system_ext system
 set vbmeta_partitions=vbmeta_system vbmeta_vendor
