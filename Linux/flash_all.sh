@@ -117,14 +117,14 @@ echo "############################"
 read -rp "Flash images on both slots? If unsure, say N. (Y/N) " SLOT_RESP
 case $SLOT_RESP in
     [yY] )
-        SLOT="--slot=all"
+        SLOT="all"
         ;;
     *)
-        SLOT="--slot=a"
+        SLOT="a"
         ;;
 esac
 
-if [ $SLOT = "--slot=all" ]; then
+if [ $SLOT = "all" ]; then
     for i in $boot_partitions; do
         for s in a b; do
             FlashImage "${i}_${s}" \ "$i.img"
@@ -132,7 +132,7 @@ if [ $SLOT = "--slot=all" ]; then
     done
 else
     for i in $boot_partitions; do
-        FlashImage "$i" \ "$i.img"
+        FlashImage "${i}_${SLOT}" \ "$i.img"
     done
 fi
 
@@ -147,7 +147,7 @@ fi
 echo "#####################"
 echo "# FLASHING FIRMWARE #"
 echo "#####################"
-if [ $SLOT = "--slot=all" ]; then
+if [ $SLOT = "all" ]; then
     for i in $firmware_partitions; do
         for s in a b; do
             FlashImage "${i}_${s}" \ "$i.img"
@@ -155,7 +155,7 @@ if [ $SLOT = "--slot=all" ]; then
     done
 else
     for i in $firmware_partitions; do
-        FlashImage "$i" \ "$i.img"
+        FlashImage "${i}_${SLOT}" \ "$i.img"
     done
 fi
 
@@ -165,10 +165,10 @@ echo "###################"
 read -rp "Disable android verified boot?, If unsure, say N. Bootloader won't be lockable if you select Y. (Y/N) " VBMETA_RESP
 case $VBMETA_RESP in
     [yY] )
-        FlashImage "$SLOT vbmeta --disable-verity --disable-verification" \ "vbmeta.img"
+        FlashImage "vbmeta --disable-verity --disable-verification" \ "vbmeta.img"
         ;;
     *)
-        FlashImage "$SLOT vbmeta" \ "vbmeta.img"
+        FlashImage "vbmeta" \ "vbmeta.img"
         ;;
 esac
 
@@ -186,7 +186,7 @@ case $LOGICAL_RESP in
             else
                 ResizeLogicalPartition
             fi
-            if [ $SLOT = "--slot=all" ]; then
+            if [ $SLOT = "all" ]; then
                 for i in $logical_partitions; do
                     for s in a b; do
                         FlashImage "${i}_${s}" \ "$i.img"
@@ -194,7 +194,7 @@ case $LOGICAL_RESP in
                 done
             else
                 for i in $logical_partitions; do
-                    FlashImage "$i" \ "$i.img"
+                    FlashImage "${i}_${SLOT}" \ "$i.img"
                 done
             fi
         else
@@ -209,7 +209,7 @@ echo "####################################"
 for i in $vbmeta_partitions; do
     case $VBMETA_RESP in
         [yY] )
-            if [ $SLOT = "--slot=all" ]; then
+            if [ $SLOT = "all" ]; then
                 for i in $boot_partitions; do
                     for s in a b; do
                         FlashImage "${i}_${s} --disable-verity --disable-verification" \ "$i.img"
@@ -217,12 +217,12 @@ for i in $vbmeta_partitions; do
                 done
             else
                 for i in $boot_partitions; do
-                    FlashImage "$i --disable-verity --disable-verification" \ "$i.img"
+                    FlashImage "${i}_${SLOT} --disable-verity --disable-verification" \ "$i.img"
                 done
             fi
             ;;
         *)
-            if [ $SLOT = "--slot=all" ]; then
+            if [ $SLOT = "all" ]; then
                 for i in $vbmeta_partitions; do
                     for s in a b; do
                         FlashImage "${i}_${s}" \ "$i.img"
@@ -230,7 +230,7 @@ for i in $vbmeta_partitions; do
                 done
             else
                 for i in $vbmeta_partitions; do
-                    FlashImage "$i" \ "$i.img"
+                    FlashImage "${i}_${SLOT}" \ "$i.img"
                 done
             fi
             ;;
