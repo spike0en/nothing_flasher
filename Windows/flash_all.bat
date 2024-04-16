@@ -75,16 +75,6 @@ if %slot% equ all (
     )
 )
 
-echo ##########################             
-echo # REBOOTING TO FASTBOOTD #       
-echo ##########################
-%fastboot% reboot fastboot
-if %errorlevel% neq 0 (
-    echo Error occured while rebooting to fastbootd. Aborting
-    pause
-    exit
-)
-
 echo #####################
 echo # FLASHING FIRMWARE #
 echo #####################
@@ -121,35 +111,6 @@ if %errorlevel% equ 1 (
     call :FlashImage "vbmeta", vbmeta.img
 )
 
-echo ###############################
-echo # FLASHING LOGICAL PARTITIONS #
-echo ###############################
-echo Flash logical partition images?
-echo If you're about to install a custom ROM that distributes its own logical partitions, say N.
-choice /m "If unsure, say Y."
-if %errorlevel% equ 1 (
-    if not exist super.img (
-        if exist super_empty.img (
-            call :WipeSuperPartition
-        ) else (
-            call :ResizeLogicalPartition
-        )
-        if %slot% equ all (
-            for %%i in (%logical_partitions%) do (
-                for %%s in (a b) do (
-                    call :FlashImage %%i_%%s, %%i.img
-                )
-            ) 
-        ) else (
-            for %%i in (%logical_partitions%) do (
-                call :FlashImage %%i_%slot%, %%i.img
-            )
-        )
-    ) else (
-        call :FlashImage super, super.img
-    )
-)
-
 echo ####################################
 echo # FLASHING OTHER VBMETA PARTITIONS #
 echo ####################################
@@ -178,6 +139,45 @@ for %%i in (%vbmeta_partitions%) do (
                     call :FlashImage "%%i_%slot% --disable-verity --disable-verification", %%i.img
                 )
         )
+    )
+)
+
+echo ##########################             
+echo # REBOOTING TO FASTBOOTD #       
+echo ##########################
+%fastboot% reboot fastboot
+if %errorlevel% neq 0 (
+    echo Error occured while rebooting to fastbootd. Aborting
+    pause
+    exit
+)
+
+echo ###############################
+echo # FLASHING LOGICAL PARTITIONS #
+echo ###############################
+echo Flash logical partition images?
+echo If you're about to install a custom ROM that distributes its own logical partitions, say N.
+choice /m "If unsure, say Y."
+if %errorlevel% equ 1 (
+    if not exist super.img (
+        if exist super_empty.img (
+            call :WipeSuperPartition
+        ) else (
+            call :ResizeLogicalPartition
+        )
+        if %slot% equ all (
+            for %%i in (%logical_partitions%) do (
+                for %%s in (a b) do (
+                    call :FlashImage %%i_%%s, %%i.img
+                )
+            ) 
+        ) else (
+            for %%i in (%logical_partitions%) do (
+                call :FlashImage %%i_%slot%, %%i.img
+            )
+        )
+    ) else (
+        call :FlashImage super, super.img
     )
 )
 

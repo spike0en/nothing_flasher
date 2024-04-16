@@ -136,14 +136,6 @@ else
     done
 fi
 
-echo "##########################"             
-echo "# REBOOTING TO FASTBOOTD #"       
-echo "##########################"
-if ! $fastboot reboot fastboot; then
-    echo "Error occured while rebooting to fastbootd. Aborting"
-    exit 1
-fi
-
 echo "#####################"
 echo "# FLASHING FIRMWARE #"
 echo "#####################"
@@ -181,37 +173,6 @@ case $VBMETA_RESP in
         ;;
 esac
 
-echo "###############################"
-echo "# FLASHING LOGICAL PARTITIONS #"
-echo "###############################"
-echo "Flash logical partition images?"
-echo "If you're about to install a custom ROM that distributes its own logical partitions, say N."
-read -rp "If unsure, say Y. (Y/N) " LOGICAL_RESP
-case $LOGICAL_RESP in
-    [yY] )
-        if [ ! -f super.img ]; then
-            if [ -f super_empty.img ]; then
-                WipeSuperPartition
-            else
-                ResizeLogicalPartition
-            fi
-            if [ $SLOT = "all" ]; then
-                for i in $logical_partitions; do
-                    for s in a b; do
-                        FlashImage "${i}_${s}" \ "$i.img"
-                    done
-                done
-            else
-                for i in $logical_partitions; do
-                    FlashImage "${i}_${SLOT}" \ "$i.img"
-                done
-            fi
-        else
-            FlashImage "super" \ "super.img"
-        fi
-        ;;
-esac
-
 echo "####################################"
 echo "# FLASHING OTHER VBMETA PARTITIONS #"
 echo "####################################"
@@ -245,6 +206,45 @@ for i in $vbmeta_partitions; do
             ;;
     esac
 done
+
+echo "##########################"             
+echo "# REBOOTING TO FASTBOOTD #"       
+echo "##########################"
+if ! $fastboot reboot fastboot; then
+    echo "Error occured while rebooting to fastbootd. Aborting"
+    exit 1
+fi
+
+echo "###############################"
+echo "# FLASHING LOGICAL PARTITIONS #"
+echo "###############################"
+echo "Flash logical partition images?"
+echo "If you're about to install a custom ROM that distributes its own logical partitions, say N."
+read -rp "If unsure, say Y. (Y/N) " LOGICAL_RESP
+case $LOGICAL_RESP in
+    [yY] )
+        if [ ! -f super.img ]; then
+            if [ -f super_empty.img ]; then
+                WipeSuperPartition
+            else
+                ResizeLogicalPartition
+            fi
+            if [ $SLOT = "all" ]; then
+                for i in $logical_partitions; do
+                    for s in a b; do
+                        FlashImage "${i}_${s}" \ "$i.img"
+                    done
+                done
+            else
+                for i in $logical_partitions; do
+                    FlashImage "${i}_${SLOT}" \ "$i.img"
+                done
+            fi
+        else
+            FlashImage "super" \ "super.img"
+        fi
+        ;;
+esac
 
 echo "#############"
 echo "# REBOOTING #"
