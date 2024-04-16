@@ -23,7 +23,7 @@ fi
 
 # Partition Variables
 boot_partitions="boot dtbo init_boot vendor_boot"
-firmware_partitions="apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img preloader_raw scp spmfw sspm tee vcp"
+firmware_partitions="apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp"
 logical_partitions="odm vendor system_ext system"
 vbmeta_partitions="vbmeta_system vbmeta_vendor"
 
@@ -157,6 +157,15 @@ else
     for i in $firmware_partitions; do
         FlashImage "${i}_${SLOT}" \ "$i.img"
     done
+fi
+
+# 'preloader_raw.img' must be flashed at a different partition name
+if [ $SLOT = "--slot=all" ]; then
+    for s in a b; do
+        FlashImage "preloader_${s}" \ "preloader_raw.img"
+    done
+else
+    FlashImage "preloader_${SLOT}" \ "preloader_raw.img"
 fi
 
 echo "###################"
