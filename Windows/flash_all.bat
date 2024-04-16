@@ -26,7 +26,7 @@ if not exist %fastboot% (
 set boot_partitions=boot dtbo init_boot vendor_boot
 set firmware_partitions=apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp
 set logical_partitions=odm vendor system_ext system
-set vbmeta_partitions=vbmeta_system vbmeta_vendor
+set vbmeta_partitions=vbmeta vbmeta_system vbmeta_vendor
 
 echo #############################
 echo # CHECKING FASTBOOT DEVICES #
@@ -102,42 +102,29 @@ if %slot% equ all (
 echo ###################
 echo # FLASHING VBMETA #
 echo ###################
-set disable_avb=0
 choice /m "Disable android verified boot?, If unsure, say N. Bootloader won't be lockable if you select Y."
 if %errorlevel% equ 1 (
-    set disable_avb=1
-    call :FlashImage "vbmeta --disable-verity --disable-verification", vbmeta.img
-) else (
-    call :FlashImage "vbmeta", vbmeta.img
-)
-
-echo ####################################
-echo # FLASHING OTHER VBMETA PARTITIONS #
-echo ####################################
-for %%i in (%vbmeta_partitions%) do (
-    if %disable_avb% equ 1 (
-            if %slot% equ all (
-                for %%i in (%vbmeta_partitions%) do (
-                    for %%s in (a b) do (
-                        call :FlashImage "%%i_%%s --disable-verity --disable-verification", %%i.img
-                    )
-                ) 
-            ) else (
-                for %%i in (%vbmeta_partitions%) do (
-                    call :FlashImage "%%i_%slot% --disable-verity --disable-verification", %%i.img
-                )
-        )
+    if %slot% equ all (
+        for %%i in (%vbmeta_partitions%) do (
+            for %%s in (a b) do (
+                call :FlashImage "%%i_%%s --disable-verity --disable-verification", %%i.img
+            )
+        ) 
     ) else (
-            if %slot% equ all (
-                for %%i in (%vbmeta_partitions%) do (
-                    for %%s in (a b) do (
-                        call :FlashImage "%%i_%%s --disable-verity --disable-verification", %%i.img
-                    )
-                ) 
-            ) else (
-                for %%i in (%vbmeta_partitions%) do (
-                    call :FlashImage "%%i_%slot% --disable-verity --disable-verification", %%i.img
-                )
+        for %%i in (%vbmeta_partitions%) do (
+            call :FlashImage "%%i_%slot% --disable-verity --disable-verification", %%i.img
+        )
+    )
+) else (
+    if %slot% equ all (
+        for %%i in (%vbmeta_partitions%) do (
+            for %%s in (a b) do (
+                call :FlashImage "%%i_%%s", %%i.img
+            )
+        ) 
+    ) else (
+        for %%i in (%vbmeta_partitions%) do (
+            call :FlashImage "%%i_%slot%", %%i.img
         )
     )
 )

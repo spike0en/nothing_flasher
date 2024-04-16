@@ -25,7 +25,7 @@ fi
 boot_partitions="boot dtbo init_boot vendor_boot"
 firmware_partitions="apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp"
 logical_partitions="odm vendor system_ext system"
-vbmeta_partitions="vbmeta_system vbmeta_vendor"
+vbmeta_partitions="vbmeta vbmeta_system vbmeta_vendor"
 
 function SetActiveSlot {
     if ! $fastboot --set-active=a; then
@@ -166,46 +166,32 @@ echo "###################"
 read -rp "Disable android verified boot?, If unsure, say N. Bootloader won't be lockable if you select Y. (Y/N) " VBMETA_RESP
 case $VBMETA_RESP in
     [yY] )
-        FlashImage "vbmeta --disable-verity --disable-verification" \ "vbmeta.img"
-        ;;
-    *)
-        FlashImage "vbmeta" \ "vbmeta.img"
-        ;;
-esac
-
-echo "####################################"
-echo "# FLASHING OTHER VBMETA PARTITIONS #"
-echo "####################################"
-for i in $vbmeta_partitions; do
-    case $VBMETA_RESP in
-        [yY] )
-            if [ $SLOT = "all" ]; then
-                for i in $boot_partitions; do
+        if [ $SLOT = "all" ]; then
+            for i in $vbmeta_partitions; do
                     for s in a b; do
                         FlashImage "${i}_${s} --disable-verity --disable-verification" \ "$i.img"
                     done
                 done
-            else
-                for i in $boot_partitions; do
-                    FlashImage "${i}_${SLOT} --disable-verity --disable-verification" \ "$i.img"
+        else
+            for i in $vbmeta_partitions; do
+                FlashImage "${i}_${SLOT} --disable-verity --disable-verification" \ "$i.img"
+            done
+        fi
+        ;;
+    *)
+        if [ $SLOT = "all" ]; then
+            for i in $vbmeta_partitions; do
+                for s in a b; do
+                    FlashImage "${i}_${s}" \ "$i.img"
                 done
-            fi
-            ;;
-        *)
-            if [ $SLOT = "all" ]; then
-                for i in $vbmeta_partitions; do
-                    for s in a b; do
-                        FlashImage "${i}_${s}" \ "$i.img"
-                    done
-                done
-            else
-                for i in $vbmeta_partitions; do
-                    FlashImage "${i}_${SLOT}" \ "$i.img"
-                done
-            fi
-            ;;
-    esac
-done
+            done
+        else
+            for i in $vbmeta_partitions; do
+                FlashImage "${i}_${SLOT}" \ "$i.img"
+            done
+        fi
+        ;;
+esac
 
 echo "##########################"             
 echo "# REBOOTING TO FASTBOOTD #"       
