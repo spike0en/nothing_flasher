@@ -147,9 +147,17 @@ fi
 echo "#####################"
 echo "# FLASHING FIRMWARE #"
 echo "#####################"
-for i in $firmware_partitions; do
-    FlashImage "$SLOT $i" \ "$i.img"
-done
+if [ $SLOT = "--slot=all" ]; then
+    for i in $firmware_partitions; do
+        for s in a b; do
+            FlashImage "${i}_${s}" \ "$i.img"
+        done
+    done
+else
+    for i in $firmware_partitions; do
+        FlashImage "$i" \ "$i.img"
+    done
+fi
 
 echo "###################"
 echo "# FLASHING VBMETA #"
@@ -178,9 +186,17 @@ case $LOGICAL_RESP in
             else
                 ResizeLogicalPartition
             fi
-            for i in $logical_partitions; do
-                FlashImage "$i" \ "$i.img"
-            done
+            if [ $SLOT = "--slot=all" ]; then
+                for i in $logical_partitions; do
+                    for s in a b; do
+                        FlashImage "${i}_${s}" \ "$i.img"
+                    done
+                done
+            else
+                for i in $logical_partitions; do
+                    FlashImage "$i" \ "$i.img"
+                done
+            fi
         else
             FlashImage "super" \ "super.img"
         fi
@@ -193,10 +209,30 @@ echo "####################################"
 for i in $vbmeta_partitions; do
     case $VBMETA_RESP in
         [yY] )
-            FlashImage "$i --disable-verity --disable-verification" \ "$i.img"
+            if [ $SLOT = "--slot=all" ]; then
+                for i in $boot_partitions; do
+                    for s in a b; do
+                        FlashImage "${i}_${s} --disable-verity --disable-verification" \ "$i.img"
+                    done
+                done
+            else
+                for i in $boot_partitions; do
+                    FlashImage "$i --disable-verity --disable-verification" \ "$i.img"
+                done
+            fi
             ;;
         *)
-            FlashImage "$i" \ "$i.img"
+            if [ $SLOT = "--slot=all" ]; then
+                for i in $vbmeta_partitions; do
+                    for s in a b; do
+                        FlashImage "${i}_${s}" \ "$i.img"
+                    done
+                done
+            else
+                for i in $vbmeta_partitions; do
+                    FlashImage "$i" \ "$i.img"
+                done
+            fi
             ;;
     esac
 done

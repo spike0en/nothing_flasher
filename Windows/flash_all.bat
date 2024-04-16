@@ -88,8 +88,16 @@ if %errorlevel% neq 0 (
 echo #####################
 echo # FLASHING FIRMWARE #
 echo #####################
-for %%i in (%firmware_partitions%) do (
-    call :FlashImage "--slot=%slot% %%i", %%i.img
+if %slot% equ all (
+    for %%i in (%firmware_partitions%) do (
+        for %%s in (a b) do (
+            call :FlashImage %%i_%%s, %%i.img
+        )
+    ) 
+) else (
+    for %%i in (%firmware_partitions%) do (
+        call :FlashImage %%i, %%i.img
+    )
 )
 
 echo ###################
@@ -117,8 +125,16 @@ if %errorlevel% equ 1 (
         ) else (
             call :ResizeLogicalPartition
         )
-        for %%i in (%logical_partitions%) do (
-            call :FlashImage %%i, %%i.img
+        if %slot% equ all (
+            for %%i in (%logical_partitions%) do (
+                for %%s in (a b) do (
+                    call :FlashImage %%i_%%s, %%i.img
+                )
+            ) 
+        ) else (
+            for %%i in (%logical_partitions%) do (
+                call :FlashImage %%i, %%i.img
+            )
         )
     ) else (
         call :FlashImage super, super.img
@@ -130,9 +146,29 @@ echo # FLASHING OTHER VBMETA PARTITIONS #
 echo ####################################
 for %%i in (%vbmeta_partitions%) do (
     if %disable_avb% equ 1 (
-        call :FlashImage "%%i --disable-verity --disable-verification", %%i.img
+            if %slot% equ all (
+                for %%i in (%vbmeta_partitions%) do (
+                    for %%s in (a b) do (
+                        call :FlashImage "%%i_%%s --disable-verity --disable-verification", %%i.img
+                    )
+                ) 
+            ) else (
+                for %%i in (%vbmeta_partitions%) do (
+                    call :FlashImage "%%i_%%s --disable-verity --disable-verification", %%i.img
+                )
+        )
     ) else (
-        call :FlashImage %%i, %%i.img
+            if %slot% equ all (
+                for %%i in (%vbmeta_partitions%) do (
+                    for %%s in (a b) do (
+                        call :FlashImage "%%i_%%s --disable-verity --disable-verification", %%i.img
+                    )
+                ) 
+            ) else (
+                for %%i in (%vbmeta_partitions%) do (
+                    call :FlashImage "%%i --disable-verity --disable-verification", %%i.img
+                )
+        )
     )
 )
 
