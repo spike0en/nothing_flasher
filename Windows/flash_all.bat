@@ -118,6 +118,7 @@ if %errorlevel% equ 1 (
         )
     )
 ) else (
+    set avb_enabled=1
     if %slot% equ all (
         for %%i in (%vbmeta_partitions%) do (
             for %%s in (a b) do (
@@ -159,6 +160,16 @@ if %errorlevel% equ 1 (
         )
     ) else (
         call :FlashImage super, super.img
+    )
+)
+
+echo ##########################
+echo # LOCKING THE BOOTLOADER #
+echo ##########################
+if %avb_enabled% equ 1 (
+    choice /m "Lock the bootloader? If unsure, say N."
+    if %errorlevel% equ 1 (
+        %fastboot% flashing lock
     )
 )
 

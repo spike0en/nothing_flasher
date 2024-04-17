@@ -180,6 +180,7 @@ case $VBMETA_RESP in
         fi
         ;;
     *)
+        avb_enabled=1
         if [ $SLOT = "all" ]; then
             for i in $vbmeta_partitions; do
                 for s in a b; do
@@ -224,6 +225,18 @@ case $LOGICAL_RESP in
         fi
         ;;
 esac
+
+echo "##########################"
+echo "# LOCKING THE BOOTLOADER #"
+echo "##########################"
+if [ "${avb_enabled}" -eq 1 ]; then
+    read -rp "Lock the bootloader? If unsure, say N (Y/N) " LOCK_RESP
+    case $LOCK_RESP in
+        [yY] )
+            $fastboot flashing lock
+            ;;
+    esac
+fi
 
 echo "#############"
 echo "# REBOOTING #"
