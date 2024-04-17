@@ -24,7 +24,7 @@ fi
 # Partition Variables
 boot_partitions="boot dtbo init_boot vendor_boot"
 firmware_partitions="apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp"
-logical_partitions="odm vendor system_ext system"
+logical_partitions="odm odm_dlkm vendor vendor_dlkm system_ext system system_dlkm"
 vbmeta_partitions="vbmeta vbmeta_system vbmeta_vendor"
 
 function SetActiveSlot {
