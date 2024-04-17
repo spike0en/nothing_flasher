@@ -26,7 +26,7 @@ if not exist %fastboot% (
 set boot_partitions=boot dtbo init_boot vendor_boot
 set main_partitions=odm_dlkm product system_dlkm vendor_dlkm
 set firmware_partitions=apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp
-set logical_partitions=odm_dlkm odm vendor_dlkm vendor system_dlkm system_ext system
+set logical_partitions=odm_dlkm odm vendor_dlkm product vendor system_dlkm system_ext system
 set vbmeta_partitions=vbmeta vbmeta_system vbmeta_vendor
 
 echo #############################
@@ -43,6 +43,7 @@ if %active_slot% equ 0 (
     echo #############################
     call :SetActiveSlot
 )
+set curSlot=a
 
 echo ###################
 echo # FORMATTING DATA #
@@ -153,16 +154,8 @@ if %errorlevel% equ 1 (
         ) else (
             call :ResizeLogicalPartition
         )
-        if %slot% equ all (
-            for %%i in (%logical_partitions%) do (
-                for %%s in (a b) do (
-                    call :FlashImage %%i_%%s, %%i.img
-                )
-            ) 
-        ) else (
-            for %%i in (%logical_partitions%) do (
-                call :FlashImage %%i_%slot%, %%i.img
-            )
+        for %%i in (%logical_partitions%) do (
+            call :FlashImage %%i_%curSlot%, %%i.img
         )
     ) else (
         call :FlashImage super, super.img
@@ -221,8 +214,8 @@ for %%i in (%logical_partitions%) do (
     for %%s in (a b) do (
         call :DeleteLogicalPartition %%i_%%s-cow
         call :DeleteLogicalPartition %%i_%%s
-        call :CreateLogicalPartition %%i_%%s, 1
     )
+    call :CreateLogicalPartition %%i_%curSlot%, 1
 )
 exit /b
 

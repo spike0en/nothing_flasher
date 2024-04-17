@@ -24,7 +24,7 @@ fi
 # Partition Variables
 boot_partitions="boot dtbo init_boot vendor_boot"
 firmware_partitions="apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp"
-logical_partitions="odm odm_dlkm vendor vendor_dlkm system_ext system system_dlkm"
+logical_partitions="odm odm_dlkm product vendor vendor_dlkm system_ext system system_dlkm"
 vbmeta_partitions="vbmeta vbmeta_system vbmeta_vendor"
 
 function SetActiveSlot {
@@ -73,8 +73,8 @@ function ResizeLogicalPartition {
         for s in a b; do 
             DeleteLogicalPartition "${i}_${s}-cow"
             DeleteLogicalPartition "${i}_${s}"
-            CreateLogicalPartition "${i}_${s}" \ "1"
         done
+    CreateLogicalPartition "${i}_${curSlot}" \ "1"
     done
 }
 
@@ -98,6 +98,7 @@ if [ ! "$ACTIVE_SLOT" = "waiting" ] && [ ! "$ACTIVE_SLOT" = "a" ]; then
     echo "#############################"
     SetActiveSlot
 fi
+curSlot="a"
 
 echo "###################"
 echo "# FORMATTING DATA #"
@@ -215,17 +216,9 @@ case $LOGICAL_RESP in
             else
                 ResizeLogicalPartition
             fi
-            if [ $SLOT = "all" ]; then
-                for i in $logical_partitions; do
-                    for s in a b; do
-                        FlashImage "${i}_${s}" \ "$i.img"
-                    done
-                done
-            else
-                for i in $logical_partitions; do
-                    FlashImage "${i}_${SLOT}" \ "$i.img"
-                done
-            fi
+            for s in a b; do
+                FlashImage "${i}_${curSlot}" \ "$i.img"
+            done
         else
             FlashImage "super" \ "super.img"
         fi
