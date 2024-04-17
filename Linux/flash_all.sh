@@ -11,11 +11,11 @@ echo "##########################################################################
 if ! command -v wget && ! command -v unzip; then
     echo "Required utilities not found."
     if command -v apt; then
-        sudo apt install wget unzip
+        sudo apt install -y wget unzip
     elif command -v pacman; then
-        sudo pacman -S wget unzip
+        sudo pacman -S --noconfirm wget unzip
     elif command -v dnf; then
-        sudo dnf install wget unzip
+        sudo dnf install -y wget unzip
     else
         echo "Please, install 'wget' and 'unzip' before executing this script."
         exit 0
