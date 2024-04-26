@@ -247,7 +247,12 @@ if [ "${avb_enabled}" -eq 1 ]; then
     read -rp "Lock the bootloader? If unsure, say N (Y/N) " LOCK_RESP
     case $LOCK_RESP in
         [yY] )
-            $fastboot flashing lock
+            if ! $fastboot reboot bootloader; then
+                echo "Error occured while rebooting to bootloader. Aborting"
+                exit 1
+            else
+                $fastboot flashing lock
+            fi
             ;;
     esac
 fi

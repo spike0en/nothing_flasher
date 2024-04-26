@@ -169,7 +169,14 @@ echo ##########################
 if %avb_enabled% equ 1 (
     choice /m "Lock the bootloader? If unsure, say N."
     if %errorlevel% equ 1 (
-        %fastboot% flashing lock
+        %fastboot% reboot bootloader
+        if %errorlevel% neq 0 (
+            echo Error occured while rebooting to bootloader. Aborting
+            pause
+            exit
+        ) else (
+            %fastboot% flashing lock
+        )
     )
 )
 
