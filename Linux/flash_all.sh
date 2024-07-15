@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "###########################################################"
-echo "#                Pong Fastboot ROM Flasher                #"
+echo "#               Spacewar Fastboot ROM Flasher             #"
 echo "#                   Developed/Tested By                   #"
 echo "#  HELLBOY017, viralbanda, spike0en, PHATwalrus, arter97  #"
 echo "#          [Nothing Phone (2) Telegram Dev Team]          #"
