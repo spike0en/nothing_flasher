@@ -1,5 +1,5 @@
 @echo off
-title Nothing Phone 2 Fastboot ROM Flasher (t.me/NothingPhone1)
+title Nothing Phone (1) Fastboot ROM Flasher (t.me/NothingPhone1)
 
 echo ###########################################################
 echo #              Spacewar Fastboot ROM Flasher              #
