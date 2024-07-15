@@ -25,7 +25,7 @@ if not exist %fastboot% (
 
 set boot_partitions=boot dtbo init_boot vendor_boot
 set main_partitions=odm_dlkm product system_dlkm vendor_dlkm
-set firmware_partitions=apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp
+set firmware_partitions=apusys ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm modem pi_img scp spmfw sspm tee vcp
 set logical_partitions=odm_dlkm odm vendor_dlkm product vendor system_dlkm system_ext system
 set vbmeta_partitions=vbmeta vbmeta_system vbmeta_vendor
 
