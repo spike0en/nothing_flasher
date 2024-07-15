@@ -16,6 +16,7 @@ chmod +x flash_all.sh && bash flash_all.sh
 
 ### Notes
 - For Linux wget and unzip utilities should be installed on your system.
+- For Windows 7, the [7zip](https://www.7-zip.org/download.html) utility must be preinstalled before running the script.
 - The script flashes the ROM on slot A and it destroys the partitions on slot B to create space for the partitions which are being flashed on slot A. This is the reason why we are not including the ability to switch slots as the partitions would get destroyed on the inactive slot which is why the script flashes the partitions on the primary slot which is slot A.
 
 ## Thanks to
