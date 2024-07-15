@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 echo "#############################################################################"
-echo "#                Pacman Fastboot ROM Flasher                                #"
-echo "#                   Developed/Tested By                                     #"
+echo "#                       Tetris Fastboot ROM Flasher                         #"
+echo "#                           Developed/Tested By                             #"
 echo "#  HELLBOY017, viralbanda, spike0en, PHATwalrus, arter97, AntoninoScordino  #"
-echo "#          [Nothing Phone (2a) Telegram Dev Team]                           #"
+echo "#                    [CMF Phone (1) Telegram Dev Team]                      #"
 echo "#############################################################################"
 
 ##----------------------------------------------------------##
