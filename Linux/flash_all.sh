@@ -22,10 +22,10 @@ if [ ! -f $fastboot ] || [ ! -x $fastboot ]; then
 fi
 
 # Partition Variables
-boot_partitions="boot vendor_boot dtbo recovery"
-firmware_partitions="abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump"
-logical_partitions="system system_ext product vendor vendor_dlkm odm"
-vbmeta_partitions="vbmeta_system vbmeta_vendor"
+boot_partitions="boot vendor_boot dtbo"
+firmware_partitions="abl aop bluetooth cpucp devcfg dsp dtbo featenabler hyp imagefv keymaster modem multiimgoem qupfw shrm tz uefisecapp xbl xbl_config"
+logical_partitions="system system_ext product vendor odm"
+vbmeta_partitions="vbmeta_system"
 
 function SetActiveSlot {
     $fastboot --set-active=a
