@@ -2,32 +2,40 @@
 title Nothing Phone (1) Fastboot ROM Flasher (t.me/NothingPhone1)
 
 echo ###########################################################
-echo #        Spacewar Fastboot ROM Flasher for Windows 7      #
-echo #                  Developed/Tested By                    #
+echo #                Pong Fastboot ROM Flasher                #
+echo #                   Developed/Tested By                   #
 echo #  HELLBOY017, viralbanda, spike0en, PHATwalrus, arter97  #
 echo #          [Nothing Phone (2) Telegram Dev Team]          #
 echo #              [Adapted to Nothing Phone (1)]             #
 echo ###########################################################
 
-cd %~dp0
-
-if not exist platform-tools-latest (
-    curl -L https://dl.google.com/android/repository/platform-tools-latest-windows.zip -o platform-tools-latest.zip
-    Call :UnZipFile "%~dp0platform-tools-latest", "%~dp0platform-tools-latest.zip"
-    del /f /q platform-tools-latest.zip
+REM Prompt for 7-Zip installation
+choice /m "Do you have 7zip installed?"
+if %errorlevel% equ 2 (
+    echo Install 7zip first and run the script again. Exiting..
+    pause
+    exit
 )
 
-set fastboot=.\platform-tools-latest\platform-tools\fastboot.exe
+cd %~dp0
+
+REM Downloading platform-tools-latest.zip using PowerShell
+powershell -command "(New-Object System.Net.WebClient).DownloadFile('https://dl.google.com/android/repository/platform-tools-latest-windows.zip', '%cd%\platform-tools-latest.zip')"
+
+REM Extracting platform-tools-latest.zip using 7-Zip
+7z x platform-tools-latest.zip -o. -y
+del /f /q platform-tools-latest.zip
+
+set fastboot=.\platform-tools\fastboot.exe
 if not exist %fastboot% (
     echo Fastboot cannot be executed. Aborting
     pause
     exit
 )
-
-set boot_partitions=boot vendor_boot dtbo
-set firmware_partitions=abl aop bluetooth cpucp devcfg dsp dtbo featenabler hyp imagefv keymaster modem multiimgoem qupfw shrm tz uefisecapp xbl xbl_config
+set boot_partitions=boot vendor_boot dtbo recovery
+set firmware_partitions=abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump
 set logical_partitions=system system_ext product vendor odm
-set vbmeta_partitions=vbmeta_system
+set vbmeta_partitions=vbmeta_system vbmeta_vendor
 
 echo #############################
 echo # CHECKING FASTBOOT DEVICES #
