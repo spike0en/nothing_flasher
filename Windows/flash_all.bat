@@ -1,5 +1,5 @@
 @echo off
-title Nothing Phone 2a Fastboot ROM Flasher (t.me/NothingPhone2a)
+title CMF Phone (1) Fastboot ROM Flasher (t.me/CMFPhone1)
 
 echo #############################################################################
 echo #                       Tetris Fastboot ROM Flasher                         #
