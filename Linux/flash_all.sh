@@ -142,12 +142,12 @@ esac
 if [ $SLOT = "all" ]; then
     for i in $boot_partitions; do
         for s in a b; do
-            FlashImage "${i}_${s}" \ "$i.img"
+            FlashImage "${i}_${s}" "$i.img"
         done
     done
 else
     for i in $boot_partitions; do
-        FlashImage "${i}_${SLOT}" \ "$i.img"
+        FlashImage "${i}_${SLOT}" "$i.img"
     done
 fi
 
@@ -157,22 +157,22 @@ echo "#####################"
 if [ $SLOT = "all" ]; then
     for i in $firmware_partitions; do
         for s in a b; do
-            FlashImage "${i}_${s}" \ "$i.img"
+            FlashImage "${i}_${s}" "$i.img"
         done
     done
 else
     for i in $firmware_partitions; do
-        FlashImage "${i}_${SLOT}" \ "$i.img"
+        FlashImage "${i}_${SLOT}" "$i.img"
     done
 fi
 
 # 'preloader_raw.img' must be flashed at a different partition name
 if [ $SLOT = "--slot=all" ]; then
     for s in a b; do
-        FlashImage "preloader_${s}" \ "preloader_raw.img"
+        FlashImage "preloader_${s}" "preloader_raw.img"
     done
 else
-    FlashImage "preloader_${SLOT}" \ "preloader_raw.img"
+    FlashImage "preloader_${SLOT}" "preloader_raw.img"
 fi
 
 echo "###################"
@@ -198,12 +198,12 @@ case $VBMETA_RESP in
         if [ $SLOT = "all" ]; then
             for i in $vbmeta_partitions; do
                 for s in a b; do
-                    FlashImage "${i}_${s}" \ "$i.img"
+                    FlashImage "${i}_${s}" "$i.img"
                 done
             done
         else
             for i in $vbmeta_partitions; do
-                FlashImage "${i}_${SLOT}" \ "$i.img"
+                FlashImage "${i}_${SLOT}" "$i.img"
             done
         fi
         ;;
@@ -232,10 +232,10 @@ case $LOGICAL_RESP in
                 ResizeLogicalPartition
             fi
             for s in a b; do
-                FlashImage "${i}_${curSlot}" \ "$i.img"
+                FlashImage "${i}_${curSlot}" "$i.img"
             done
         else
-            FlashImage "super" \ "super.img"
+            FlashImage "super" "super.img"
         fi
         ;;
 esac
