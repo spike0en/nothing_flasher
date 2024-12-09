@@ -223,9 +223,17 @@ for %%i in (%logical_partitions%) do (
 exit /b
 
 :DeleteLogicalPartition
+echo %~1 | find /c "cow" 2>&1
+if %errorlevel% equ 0 (
+    set partition_is_cow=true
+) else (
+    set partition_is_cow=false
+)
 %fastboot% delete-logical-partition %~1
 if %errorlevel% neq 0 (
-    call :Choice "Deleting %~1 partition failed"
+    if %partition_is_cow% equ false (
+        call :Choice "Deleting %~1 partition failed"
+    )
 )
 exit /b
 
