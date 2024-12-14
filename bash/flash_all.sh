@@ -201,9 +201,9 @@ else
     FlashImage "super" \ "super.img"
 fi
 
-# Reboot to bootloader if in fastbootd
-if [ ! -f super.img ]; then
-    RebootBootloader
+# Reboot to fastbootd if in bootloader
+if [ -f super.img ]; then
+    RebootFastbootD
 fi
 
 echo "####################################"
@@ -219,9 +219,6 @@ for i in $vbmeta_partitions; do
             ;;
     esac
 done
-
-# Reboot to fastboot
-RebootFastbootD
 
 echo "#####################"
 echo "# FLASHING FIRMWARE #"
