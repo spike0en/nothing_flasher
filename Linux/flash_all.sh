@@ -231,7 +231,7 @@ case $LOGICAL_RESP in
             else
                 ResizeLogicalPartition
             fi
-            for s in a b; do
+            for i in $logical_partitions; do
                 FlashImage "${i}_${curSlot}" "$i.img"
             done
         else
