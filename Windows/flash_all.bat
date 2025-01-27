@@ -1,6 +1,14 @@
 @echo off
 title Nothing Phone 2 Fastboot ROM Flasher
 
+:: Ensure the script runs as administrator
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    :: Relaunch the script as administrator using PowerShell
+    powershell -Command "Start-Process '%~f0' -Verb RunAs"
+    exit /b
+)
+
 echo #############################
 echo # Pong Fastboot ROM Flasher #
 echo #############################
