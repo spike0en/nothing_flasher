@@ -123,27 +123,6 @@ if %slot% equ all (
     call :FlashImage preloader_%slot% preloader_raw.img
 )
 
-echo ###############################
-echo # FLASHING LOGICAL PARTITIONS #
-echo ###############################
-if not exist super.img (
-    call :RebootFastbootD
-    if exist super_empty.img (
-        call :WipeSuperPartition
-    ) else (
-        call :ResizeLogicalPartition
-    )
-    for %%i in (%logical_partitions%) do (
-        call :FlashImage %%i, %%i.img
-    )
-) else (
-    call :FlashImage super, super.img
-)
-
-if exist super.img (
-    call :RebootFastbootD
-)
-
 echo ####################################
 echo # FLASHING OTHER VBMETA PARTITIONS #
 echo ####################################
@@ -153,6 +132,24 @@ for %%i in (%vbmeta_partitions%) do (
     ) else (
         call :FlashImage %%i, %%i.img
     )
+)
+
+echo ###############################  
+echo # FLASHING LOGICAL PARTITIONS #
+echo ###############################  
+call :RebootFastbootD
+
+if not exist super.img (
+    if exist super_empty.img (
+        call :WipeSuperPartition
+    ) else (
+        call :ResizeLogicalPartition
+    )
+    for %%i in (%logical_partitions%) do (
+        call :FlashImage %%i_%slot% %%i.img
+    )
+) else (
+    call :FlashImage super super.img
 )
 
 echo #############
@@ -258,18 +255,6 @@ exit /b
 %fastboot% create-logical-partition %~1 %~2
 if %errorlevel% neq 0 (
     call :Choice "Creating %~1 partition failed"
-)
-exit /b
-
-:RebootBootloader
-echo ###########################             
-echo # REBOOTING TO BOOTLOADER #       
-echo ###########################
-%fastboot% reboot bootloader
-if %errorlevel% neq 0 (
-    echo Error occured while rebooting to bootloader. Aborting
-    pause
-    exit
 )
 exit /b
 
