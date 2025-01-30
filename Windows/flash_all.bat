@@ -1,5 +1,5 @@
 @echo off
-title Nothing Phone 2 Fastboot ROM Flasher
+title Nothing Phone 2a Fastboot ROM Flasher
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -9,9 +9,10 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo #############################
-echo # Pong Fastboot ROM Flasher #
-echo #############################
+echo ###############################
+echo # Pacman Fastboot ROM Flasher #
+echo #   t.me/s/nothing_archive    #
+echo ###############################
 
 cd %~dp0
 
