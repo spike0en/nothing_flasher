@@ -1,5 +1,5 @@
 @echo off
-title Nothing Phone 2a Fastboot ROM Flasher
+title CMF Phone (1) Fastboot ROM Flasher
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -10,7 +10,7 @@ if %errorlevel% neq 0 (
 )
 
 echo ###############################
-echo # Pacman Fastboot ROM Flasher #
+echo # Tetris Fastboot ROM Flasher #
 echo #   t.me/s/nothing_archive    #
 echo ###############################
 
