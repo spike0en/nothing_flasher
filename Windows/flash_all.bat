@@ -99,6 +99,15 @@ if %errorlevel% equ 1 (
     )
 )
 
+:: Flash 'preloader_raw.img' separately
+if %slot% equ all (
+    for %%s in (a b) do (
+        call :FlashImage preloader_%%s preloader_raw.img
+    )
+) else (
+    call :FlashImage preloader_%slot% preloader_raw.img
+)
+
 echo ###############################
 echo # FLASHING LOGICAL PARTITIONS #
 echo ###############################
