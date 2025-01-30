@@ -29,11 +29,12 @@ if not exist %fastboot% (
     exit
 )
 
-set boot_partitions=boot vendor_boot dtbo recovery
-set firmware_partitions=abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump
-set logical_partitions=system system_ext product vendor vendor_dlkm odm
+set boot_partitions=boot dtbo init_boot vendor_boot
+set main_partitions=odm_dlkm product system_dlkm vendor_dlkm
+set firmware_partitions=apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp
+set logical_partitions=odm_dlkm odm vendor_dlkm product vendor system_dlkm system_ext system
 set junk_logical_partitions=null
-set vbmeta_partitions=vbmeta_system vbmeta_vendor
+set vbmeta_partitions=vbmeta vbmeta_system vbmeta_vendor
 
 echo #############################
 echo # CHECKING FASTBOOT DEVICES #
