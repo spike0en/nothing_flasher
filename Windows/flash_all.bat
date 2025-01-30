@@ -75,6 +75,21 @@ if %slot% equ all (
     )
 )
 
+echo #####################
+echo # FLASHING FIRMWARE #
+echo #####################
+if %slot% equ all (
+    for %%i in (%firmware_partitions%) do (
+        for %%s in (a b) do (
+            call :FlashImage %%i_%%s, %%i.img
+        )
+    ) 
+) else (
+    for %%i in (%firmware_partitions%) do (
+        call :FlashImage %%i, %%i.img
+    )
+)
+
 echo ###################
 echo # FLASHING VBMETA #
 echo ###################
@@ -136,21 +151,6 @@ for %%i in (%vbmeta_partitions%) do (
     if %disable_avb% equ 1 (
         call :FlashImage "%%i --disable-verity --disable-verification", %%i.img
     ) else (
-        call :FlashImage %%i, %%i.img
-    )
-)
-
-echo #####################
-echo # FLASHING FIRMWARE #
-echo #####################
-if %slot% equ all (
-    for %%i in (%firmware_partitions%) do (
-        for %%s in (a b) do (
-            call :FlashImage %%i_%%s, %%i.img
-        )
-    ) 
-) else (
-    for %%i in (%firmware_partitions%) do (
         call :FlashImage %%i, %%i.img
     )
 )
