@@ -9,32 +9,54 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
+:: Set working directory and validate paths
+set "WORK_DIR=%~dp0"
+cd /d "%WORK_DIR%"
+
 echo ###############################
 echo # Tetris Fastboot ROM Flasher #
 echo #   t.me/s/nothing_archive    #
 echo ###############################
 
-cd %~dp0
-
-if not exist platform-tools-latest (
-    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools-latest-windows.zip -o platform-tools-latest.zip
-    Call :UnZipFile "%~dp0platform-tools-latest.zip", "%~dp0platform-tools-latest"
-    del /f /q platform-tools-latest.zip
-)
-
-set fastboot=.\platform-tools-latest\platform-tools\fastboot.exe
-if not exist %fastboot% (
-    echo Fastboot cannot be executed. Aborting
-    pause
-    exit
-)
-
+:: Set partition variables
 set boot_partitions=boot dtbo init_boot vendor_boot
 set main_partitions=odm_dlkm product system_dlkm vendor_dlkm
 set firmware_partitions=apusys ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm modem pi_img scp spmfw sspm tee vcp
 set logical_partitions=odm_dlkm odm vendor_dlkm product vendor system_dlkm system_ext system
 set junk_logical_partitions=null
 set vbmeta_partitions=vbmeta vbmeta_system vbmeta_vendor
+
+echo #############################
+echo # SETTING UP PLATFORM TOOLS #
+echo #############################
+
+:: Download platform-tools if does not exist
+if not exist platform-tools-latest (
+    echo Platform tools not found. Downloading...
+    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools-latest-windows.zip -o platform-tools-latest.zip
+    if exist platform-tools-latest.zip (
+        echo Platform tools downloaded successfully.
+        Call :UnZipFile "%~dp0platform-tools-latest.zip", "%~dp0platform-tools-latest"
+        echo Platform tools extracted successfully.
+        del /f /q platform-tools-latest.zip
+    ) else (
+        echo Error: Failed to download platform tools.
+        exit /b 1
+    )
+) else (
+    echo Platform tools already exist. Skipping download...
+)
+
+:: Validate fastboot existence
+set "fastboot=.\platform-tools-latest\platform-tools\fastboot.exe"
+if not exist "%fastboot%" (
+    echo Error: Fastboot executable not found.
+    echo Please ensure platform tools are properly downloaded.
+    pause
+    exit /b 1
+) else (
+    echo Fastboot executable found successfully.
+)
 
 echo #############################
 echo # CHECKING FASTBOOT DEVICES #
