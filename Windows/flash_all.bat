@@ -212,8 +212,30 @@ pause
 exit
 
 :UnZipFile
-mkdir "%~2"
-tar -xf "%~1" -C "%~2"
+:: Try to extract using PowerShell
+powershell -Command "Expand-Archive -Path '%~1' -DestinationPath '%~2' -Force"
+if %errorlevel% neq 0 (
+    :: If PowerShell fails, display message and prepare to use tar
+    echo Extraction using PowerShell has failed, trying with tar...
+
+    :: Try to extract using tar
+    if exist "%~2" (
+        echo Directory "%~2" exists, removing it...
+        rmdir /s /q "%~2"
+    )
+    mkdir "%~2"
+    tar -xf "%~1" -C "%~2"
+    if %errorlevel% neq 0 (
+        :: In rare cases, if tar also fails, guide the user to do it manually
+        echo Extraction using tar has failed.
+        echo Please download the platform-tools from the link below:
+        echo Link: https://developer.android.com/tools/releases/platform-tools
+        echo Then, extract it manually to the following directory structure:
+        echo .\platform-tools-latest\platform-tools\ (in the same directory as this script)
+        echo
+        exit /b 1
+    )
+)
 exit /b
 
 :SetActiveSlot
