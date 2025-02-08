@@ -125,11 +125,12 @@ if %errorlevel% equ 1 (
     )
 )
 
+call :RebootFastbootD
+
 echo ###############################
 echo # FLASHING LOGICAL PARTITIONS #
 echo ###############################
 if not exist super.img (
-    call :RebootFastbootD
     if exist super_empty.img (
         call :WipeSuperPartition
     ) else (
@@ -140,10 +141,6 @@ if not exist super.img (
     )
 ) else (
     call :FlashImage super, super.img
-)
-
-if exist super.img (
-    call :RebootFastbootD
 )
 
 echo ####################################
