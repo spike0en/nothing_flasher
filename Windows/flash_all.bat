@@ -30,6 +30,40 @@ cd /d "%WORK_DIR%" 2>nul || (
 )
 echo [SUCCESS] Working directory set to: "%CD%"
 
+echo ############################
+echo #  PRE-REQUIREMENTS CHECK  #
+echo ############################
+
+:: Check 1: Is bootloader unlocked?
+choice /m "Is your device bootloader unlocked?"
+if %errorlevel% equ 2 (
+    echo To use this script, your device bootloader must be unlocked.
+    echo Please unlock it before proceeding.
+    pause
+    exit /b 1
+)
+
+:: Check 2: Is the device in bootloader mode?
+choice /m "Are you in bootloader mode?"
+if %errorlevel% equ 2 (
+    echo Ensure your device is in bootloader mode before proceeding.
+    echo You can enter bootloader mode by holding Power + Volume Down and releasing the Power Key when the OEM logo appears or by using:
+    echo adb reboot bootloader
+    pause
+    exit /b 1
+)
+
+:: Check 3: Are fastboot drivers installed?
+choice /m "Are your fastboot drivers properly installed? (Can you see 'Android Bootloader Interface' in Device Manager?)"
+if %errorlevel% equ 2 (
+    echo Please install the proper fastboot drivers before proceeding.
+    echo Install the latest Google USB Drivers from https://developer.android.com/studio/run/win-usb
+    pause
+    exit /b 1
+)
+
+echo All pre-requirements met! Proceeding...
+
 echo #############################
 echo # SETTING UP PLATFORM TOOLS #
 echo #############################
