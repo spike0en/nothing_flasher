@@ -65,42 +65,20 @@ if %errorlevel% equ 2 (
 
 echo All pre-requirements met! Proceeding...
 
-echo #############################
-echo # SETTING UP PLATFORM TOOLS #
-echo #############################
+:: ----------------------------------
+::  PLATFORM TOOLS SETUP & VALIDATION
+:: ----------------------------------
 
-:: Download platform-tools if does not exist
-if not exist platform-tools-latest (
-    echo Platform tools not found. Downloading...
-    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools-latest-windows.zip -o platform-tools-latest.zip
-    if exist platform-tools-latest.zip (
-        echo Platform tools downloaded successfully.
-        Call :UnZipFile "%~dp0platform-tools-latest.zip", "%~dp0platform-tools-latest"
-        echo Platform tools extracted successfully.
-        del /f /q platform-tools-latest.zip
-    ) else (
-        echo Error: Failed to download platform tools.
-        exit /b 1
-    )
-) else (
-    echo Platform tools already exist. Skipping download...
-)
+:: Setup platform-tools
+call :PlatformToolsSetup
 
 :: Validate fastboot existence
-set "fastboot=.\platform-tools-latest\platform-tools\fastboot.exe"
-if not exist "%fastboot%" (
-    echo Error: Fastboot executable not found.
-    echo Please ensure platform tools are properly downloaded.
-    pause
-    exit /b 1
-) else (
-    echo Fastboot executable found successfully.
-)
+call :FastbootValidation
 
 echo #############################
 echo # CHECKING FASTBOOT DEVICES #
 echo #############################
-%fastboot% devices
+call :CheckFastbootDevices
 
 echo #############################
 echo # CHANGING ACTIVE SLOT TO A #
@@ -240,6 +218,53 @@ echo You may now optionally re-lock the bootloader if you haven't disabled andro
 pause
 exit
 
+:PlatformToolsSetup
+echo #############################
+echo # SETTING UP PLATFORM TOOLS #
+echo #############################
+if not exist platform-tools-latest (
+    echo Platform tools not found. Downloading...
+    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools-latest-windows.zip -o platform-tools-latest.zip
+    if exist platform-tools-latest.zip (
+        echo Platform tools downloaded successfully.
+        call :UnZipFile "%~dp0platform-tools-latest.zip" "%~dp0platform-tools-latest"
+        echo Platform tools extracted successfully.
+        del /f /q platform-tools-latest.zip
+    ) else (
+        echo Error: Failed to download platform tools.
+        exit /b 1
+    )
+) else (
+    echo Platform tools already exist. Skipping download...
+)
+exit /b
+
+:FastbootValidation
+echo ################################
+echo # CHECKING FASTBOOT EXECUTABLE # 
+echo ################################
+set "fastboot=.\platform-tools-latest\platform-tools\fastboot.exe"
+
+:: Ensure fastboot.exe exists
+if not exist "%fastboot%" (
+    echo [ERROR] Fastboot executable not found.
+    echo Please ensure platform tools are properly downloaded.
+    pause
+    exit /b 1
+)
+
+:: Ensure fastboot is executable and prints version
+%fastboot% --version
+if %errorlevel% neq 0 (
+    echo [ERROR] Fastboot executable is not functioning properly.
+    echo Try running "fastboot --version" manually.
+    pause
+    exit /b 1
+)
+
+echo [SUCCESS] Fastboot executable found and verified.
+exit /b
+
 :UnZipFile
 :: Try to extract using PowerShell
 powershell -Command "Expand-Archive -Path '%~1' -DestinationPath '%~2' -Force"
@@ -265,6 +290,37 @@ if %errorlevel% neq 0 (
         exit /b 1
     )
 )
+exit /b
+
+:CheckFastbootDevices
+:: Clear any previous DEVICE_ID
+set "DEVICE_ID="
+
+:: Run fastboot devices and capture output
+for /f "tokens=1" %%A in ('%fastboot% devices 2^>nul') do (
+    set "DEVICE_ID=%%A"
+)
+
+:: Check if fastboot executed successfully
+if %errorlevel% neq 0 (
+    echo [ERROR] Fastboot command failed to execute.
+    echo - Ensure fastboot.exe is available and your environment is set up correctly.
+    pause
+    exit /b 1
+)
+
+:: Check if a device was detected
+if not defined DEVICE_ID (
+    echo [ERROR] No fastboot device detected!
+    echo - Ensure your device is in fastboot mode.
+    echo - Check USB connection and try a different port.
+    echo - Install proper drivers if not already installed.
+    echo - Run "fastboot devices" manually to verify.
+    pause
+    exit /b 1
+)
+
+echo [SUCCESS] Fastboot device detected: %DEVICE_ID%
 exit /b
 
 :SetActiveSlot
