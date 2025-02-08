@@ -9,10 +9,6 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-:: Set working directory and validate paths
-set "WORK_DIR=%~dp0"
-cd /d "%WORK_DIR%"
-
 echo #############################
 echo # Pong Fastboot ROM Flasher #
 echo #############################
@@ -23,6 +19,16 @@ set firmware_partitions=abl aop aop_config bluetooth cpucp devcfg dsp featenable
 set logical_partitions=system system_ext product vendor vendor_dlkm odm
 set junk_logical_partitions=null
 set vbmeta_partitions=vbmeta_system vbmeta_vendor
+
+:: Set working directory
+set "WORK_DIR=%~dp0"
+echo [INFO] Setting working directory to: "%WORK_DIR%"
+cd /d "%WORK_DIR%" 2>nul || (
+    echo [ERROR] Failed to set working directory: "%WORK_DIR%"
+    pause
+    exit /b 1
+)
+echo [SUCCESS] Working directory set to: "%CD%"
 
 echo #############################
 echo # SETTING UP PLATFORM TOOLS #
