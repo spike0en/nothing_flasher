@@ -1,5 +1,5 @@
 @echo off
-title CMF Phone (1) Fastboot ROM Flasher
+title CMF Phone 1 Fastboot ROM Flasher
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -9,22 +9,27 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-:: Set working directory and validate paths
-set "WORK_DIR=%~dp0"
-cd /d "%WORK_DIR%"
-
 echo ###############################
 echo # Tetris Fastboot ROM Flasher #
 echo #   t.me/s/nothing_archive    #
 echo ###############################
 
-:: Set partition variables
 set boot_partitions=boot dtbo init_boot vendor_boot
 set main_partitions=odm_dlkm product system_dlkm vendor_dlkm
 set firmware_partitions=apusys ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm modem pi_img scp spmfw sspm tee vcp
 set logical_partitions=odm_dlkm odm vendor_dlkm product vendor system_dlkm system_ext system
 set junk_logical_partitions=null
 set vbmeta_partitions=vbmeta vbmeta_system vbmeta_vendor
+
+:: Set working directory
+set "WORK_DIR=%~dp0"
+echo [INFO] Setting working directory to: "%WORK_DIR%"
+cd /d "%WORK_DIR%" 2>nul || (
+    echo [ERROR] Failed to set working directory: "%WORK_DIR%"
+    pause
+    exit /b 1
+)
+echo [SUCCESS] Working directory set to: "%CD%"
 
 echo #############################
 echo # SETTING UP PLATFORM TOOLS #
