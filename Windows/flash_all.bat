@@ -1,5 +1,5 @@
 @echo off
-title Nothing Phone 2 Fastboot ROM Flasher
+title Nothing Phone (1) Fastboot ROM Flasher
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -9,16 +9,17 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo #############################
-echo # Pong Fastboot ROM Flasher #
-echo #############################
+echo #################################
+echo # Spacewar Fastboot ROM Flasher #
+echo #   (t.me/s/nothing_archive)    #
+echo #################################
 
 :: Set partition variables
-set boot_partitions=boot vendor_boot dtbo recovery
-set firmware_partitions=abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump
-set logical_partitions=system system_ext product vendor vendor_dlkm odm
+set boot_partitions=boot vendor_boot dtbo
+set firmware_partitions=abl aop bluetooth cpucp devcfg dsp dtbo featenabler hyp imagefv keymaster modem multiimgoem qupfw shrm tz uefisecapp xbl xbl_config
+set logical_partitions=system system_ext product vendor odm
 set junk_logical_partitions=null
-set vbmeta_partitions=vbmeta_system vbmeta_vendor
+set vbmeta_partitions=vbmeta_system
 
 :: Set working directory
 set "WORK_DIR=%~dp0"

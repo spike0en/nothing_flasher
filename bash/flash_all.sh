@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-echo "#############################"
-echo "# Pong Fastboot ROM Flasher #"
-echo "#############################"
+echo "#################################"
+echo "# Spacewar Fastboot ROM Flasher #"
+echo "#    t.me/s/Nothing_Archive     #"
+echo "#################################"
 
 ##----------------------------------------------------------##
 if [ ! -d "$(pwd)/platform-tools" ]; then
@@ -24,11 +25,11 @@ if [ ! -f "$fastboot" ] || [ ! -x "$fastboot" ]; then
 fi
 
 # Partition Variables
-boot_partitions="boot vendor_boot dtbo recovery"
-firmware_partitions="abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump"
-logical_partitions="system system_ext product vendor vendor_dlkm odm"
+boot_partitions="boot vendor_boot dtbo"
+firmware_partitions="abl aop bluetooth cpucp devcfg dsp dtbo featenabler hyp imagefv keymaster modem multiimgoem qupfw shrm tz uefisecapp xbl xbl_config"
+logical_partitions="system system_ext product vendor odm"
 junk_logical_partitions="null"
-vbmeta_partitions="vbmeta_system vbmeta_vendor"
+vbmeta_partitions="vbmeta_system"
 
 function SetActiveSlot {
     if ! "$fastboot" --set-active=a; then
