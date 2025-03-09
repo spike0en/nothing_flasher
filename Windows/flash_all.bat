@@ -110,7 +110,7 @@ if %slot% equ all (
     ) 
 ) else (
     for %%i in (%boot_partitions%) do (
-        call :FlashImage %%i, %%i.img
+        call :FlashImage %%i_%slot%, %%i.img
     )
 )
 
@@ -125,7 +125,7 @@ if %slot% equ all (
     ) 
 ) else (
     for %%i in (%firmware_partitions%) do (
-        call :FlashImage %%i, %%i.img
+        call :FlashImage %%i_%slot%, %%i.img
     )
 )
 
