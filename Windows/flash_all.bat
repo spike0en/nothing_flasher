@@ -1,5 +1,5 @@
 @echo off
-title Nothing Phone 2 Fastboot ROM Flasher
+title Nothing Phone 3a Series Fastboot ROM Flasher
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -9,10 +9,10 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo #############################
-echo # Pong Fastboot ROM Flasher #
-echo #  t.me/s/nothing_archive   #
-echo #############################
+echo ##################################
+echo # Asteroids Fastboot ROM Flasher #
+echo #    t.me/s/nothing_archive      #
+echo ##################################
 
 :: Set partition variables
 set boot_partitions=boot vendor_boot dtbo recovery
