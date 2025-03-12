@@ -15,9 +15,9 @@ echo #    t.me/s/nothing_archive      #
 echo ##################################
 
 :: Set partition variables
-set boot_partitions=boot vendor_boot dtbo recovery
+set boot_partitions=boot init_boot vendor_boot dtbo recovery
 set firmware_partitions=abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump
-set logical_partitions=system system_ext product vendor vendor_dlkm odm
+set logical_partitions=system system_ext product vendor system_dlkm vendor_dlkm odm
 set junk_logical_partitions=null
 set vbmeta_partitions=vbmeta_system vbmeta_vendor
 
