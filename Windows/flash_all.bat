@@ -1,3 +1,6 @@
+:: SPDX-FileCopyrightText: Hellboy017, spike0en
+:: SPDX-License-Identifier: MIT
+
 @echo off
 title Nothing Phone 2 Fastboot ROM Flasher
 
