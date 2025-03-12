@@ -1,3 +1,6 @@
+:: SPDX-FileCopyrightText: Hellboy017, spike0en
+:: SPDX-License-Identifier: MIT
+
 @echo off
 title CMF Phone 1 Fastboot ROM Flasher
 
