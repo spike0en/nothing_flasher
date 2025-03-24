@@ -139,20 +139,13 @@ set disable_avb=0
 choice /m "Disable android verified boot?, If unsure, say N. Bootloader won't be lockable if you select Y."
 if %errorlevel% equ 1 (
     set disable_avb=1
-    if %slot% equ all (
-        for %%s in (a b) do (
-            call :FlashImage "vbmeta_%%s --disable-verity --disable-verification", vbmeta.img
-        )
+)
+
+for %%s in (a b) do (
+    if %disable_avb% equ 1 (
+        call :FlashImage "vbmeta_%%s --disable-verity --disable-verification", vbmeta.img
     ) else (
-        call :FlashImage "vbmeta --disable-verity --disable-verification", vbmeta.img
-    )
-) else (
-    if %slot% equ all (
-        for %%s in (a b) do (
-            call :FlashImage "vbmeta_%%s", vbmeta.img
-        )
-    ) else (
-        call :FlashImage "vbmeta", vbmeta.img
+        call :FlashImage "vbmeta_%%s", vbmeta.img
     )
 )
 
@@ -169,10 +162,12 @@ echo ####################################
 echo # FLASHING OTHER VBMETA PARTITIONS #
 echo ####################################
 for %%i in (%vbmeta_partitions%) do (
-    if %disable_avb% equ 1 (
-        call :FlashImage "%%i --disable-verity --disable-verification", %%i.img
-    ) else (
-        call :FlashImage %%i, %%i.img
+    for %%s in (a b) do (
+        if %disable_avb% equ 1 (
+            call :FlashImage "%%i_%%s --disable-verity --disable-verification", %%i.img
+        ) else (
+            call :FlashImage "%%i_%%s", %%i.img
+        )
     )
 )
 
