@@ -202,6 +202,7 @@ if not exist super.img (
 echo #############
 echo # REBOOTING #
 echo #############
+call :SetActiveSlot
 choice /m "Reboot to system? If unsure, say Y."
 if %errorlevel% equ 1 (
     %fastboot% reboot
