@@ -183,16 +183,8 @@ if not exist super.img (
         call :ResizeLogicalPartition
     )
 
-    if %slot% equ all (
-        for %%i in (%logical_partitions%) do (
-            for %%s in (a b) do (
-                call :FlashImage %%i_%%s %%i.img
-            )
-        )
-    ) else (
-        for %%i in (%logical_partitions%) do (
-            call :FlashImage %%i_%slot% %%i.img
-        )
+    for %%i in (%logical_partitions%) do (
+        call :FlashImage %%i_a %%i.img
     )
 
 ) else (
@@ -374,19 +366,11 @@ if %junk_logical_partitions% neq null (
     )
 )
 
-if %slot% equ all (
-    for %%i in (%logical_partitions%) do (
-        for %%s in (a b) do (
-            call :DeleteLogicalPartition %%i_%%s-cow
-            call :DeleteLogicalPartition %%i_%%s
-            call :CreateLogicalPartition %%i_%%s, 1
-        )
-    )
-) else (
-    for %%i in (%logical_partitions%) do (
-        call :DeleteLogicalPartition %%i_%slot%-cow
-        call :DeleteLogicalPartition %%i_%slot%
-        call :CreateLogicalPartition %%i_%slot%, 1
+for %%i in (%logical_partitions%) do (
+    for %%s in (a b) do (
+        call :DeleteLogicalPartition %%i_%%s-cow
+        call :DeleteLogicalPartition %%i_%%s
+        call :CreateLogicalPartition %%i_%%s, 1
     )
 )
 exit /b
