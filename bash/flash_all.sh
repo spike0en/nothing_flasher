@@ -46,9 +46,9 @@ function handle_fastboot_error {
     esac
 }
 
-function WipeData {
-    if ! "$fastboot" -w; then
-        read -rp "Wiping data failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
+function ErasePartition {
+    if ! "$fastboot" erase $1; then
+        read -rp "Erasing $1 partition failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
         handle_fastboot_error
     fi
 }
@@ -139,7 +139,9 @@ echo "###################"
 read -rp "Wipe Data? (Y/N) " DATA_RESP
 case "$DATA_RESP" in
     [yY] )
-        WipeData
+        echo 'Please ignore "Did you mean to format this partition?" warnings.'
+        ErasePartition userdata
+        ErasePartition metadata
         ;;
 esac
 
@@ -155,7 +157,7 @@ for i in $boot_partitions; do
             done
 	    ;;
 	*)
-            FlashImage "$i" \ "$i.img"
+            FlashImage "${i}_a" \ "$i.img"
 	    ;;
     esac
 done
@@ -171,7 +173,7 @@ case "$VBMETA_RESP" in
                 FlashImage "vbmeta_${s} --disable-verity --disable-verification" \ "vbmeta.img"
             done
         else
-            FlashImage "vbmeta --disable-verity --disable-verification" \ "vbmeta.img"
+            FlashImage "vbmeta_a --disable-verity --disable-verification" \ "vbmeta.img"
         fi
         ;;
     *)
@@ -180,31 +182,27 @@ case "$VBMETA_RESP" in
                 FlashImage "vbmeta_${s}" \ "vbmeta.img"
             done
         else
-            FlashImage "vbmeta" \ "vbmeta.img"
+            FlashImage "vbmeta_a" \ "vbmeta.img"
         fi
         ;;
 esac
+
+RebootFastbootD
 
 echo "###############################"
 echo "# FLASHING LOGICAL PARTITIONS #"
 echo "###############################"
 if [ ! -f super.img ]; then
-    RebootFastbootD
     if [ -f super_empty.img ]; then
         WipeSuperPartition
     else
         ResizeLogicalPartition
     fi
     for i in $logical_partitions; do
-        FlashImage "$i" \ "$i.img"
+        FlashImage "${i}_a" \ "$i.img"
     done
 else
     FlashImage "super" \ "super.img"
-fi
-
-# Reboot to fastbootd if in bootloader
-if [ -f super.img ]; then
-    RebootFastbootD
 fi
 
 echo "####################################"
@@ -213,10 +211,10 @@ echo "####################################"
 for i in $vbmeta_partitions; do
     case "$VBMETA_RESP" in
         [yY] )
-            FlashImage "$i --disable-verity --disable-verification" \ "$i.img"
+            FlashImage "${i}_a --disable-verity --disable-verification" \ "$i.img"
             ;;
         *)
-            FlashImage "$i" \ "$i.img"
+            FlashImage "${i}_a" \ "$i.img"
             ;;
     esac
 done
@@ -232,7 +230,7 @@ for i in $firmware_partitions; do
             done
 	    ;;
 	*)
-            FlashImage "$i" \ "$i.img"
+            FlashImage "${i}_a" \ "$i.img"
 	    ;;
     esac
 done
