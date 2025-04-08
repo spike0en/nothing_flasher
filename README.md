@@ -68,5 +68,6 @@
 - [arter97](https://github.com/arter97/Pong_fastboot_flasher)
 - [AntoninoScordino](https://github.com/nothing-Pacman/flashtool)
 - [Phatwalrus](https://github.com/PHATWalrus)
+- [XelXen](https://github.com/XelXen)
 
 ---
