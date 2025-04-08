@@ -14,7 +14,6 @@ if %errorlevel% neq 0 (
 
 echo #############################
 echo # Pong Fastboot ROM Flasher #
-echo #  t.me/s/nothing_archive   #
 echo #############################
 
 :: Set partition variables
