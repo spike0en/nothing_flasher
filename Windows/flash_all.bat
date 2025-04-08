@@ -14,7 +14,6 @@ if %errorlevel% neq 0 (
 
 echo ###############################
 echo # Tetris Fastboot ROM Flasher #
-echo #   t.me/s/nothing_archive    #
 echo ###############################
 
 set boot_partitions=boot dtbo init_boot vendor_boot
