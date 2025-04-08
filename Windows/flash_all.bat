@@ -134,7 +134,7 @@ if %errorlevel% equ 1 (
             call :FlashImage "vbmeta_%%s --disable-verity --disable-verification", vbmeta.img
         )
     ) else (
-        call :FlashImage "vbmeta --disable-verity --disable-verification", vbmeta.img
+        call :FlashImage "vbmeta_a --disable-verity --disable-verification", vbmeta.img
     )
 ) else (
     if %slot% equ all (
@@ -142,7 +142,7 @@ if %errorlevel% equ 1 (
             call :FlashImage "vbmeta_%%s", vbmeta.img
         )
     ) else (
-        call :FlashImage "vbmeta", vbmeta.img
+        call :FlashImage "vbmeta_a", vbmeta.img
     )
 )
 
