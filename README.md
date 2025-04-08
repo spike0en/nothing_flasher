@@ -1,8 +1,16 @@
-# Nothing & CMF Fastboot Flashing Scripts
+# Nothing Flasher
+
+<img src="./logo.png" width="96" alt="Nothing Flasher Logo">
+
+[![Stars](https://img.shields.io/github/stars/spike0en/nothing_flasher?logo=github&color=D4AF37)](https://github.com/spike0en/nothing_flasher/stargazzers)
+[![Contributors](https://img.shields.io/github/contributors/spike0en/nothing_flasher?logo=github&color=9B5DE5)](https://github.com/spike0en/nothing_flasher/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/spike0en/nothing_flasher?logo=github&color=468FAF)](https://github.com/spike0en/nothing_flasher/network/members)
+
+---
 
 ## About 📋:
 
-- This collection of fastboot flashing scripts is designed for flashing stock [Nothing OS firmware](https://github.com/spike0en/nothing_archive) on Nothing & CMF devices, supporting both Windows and bash platforms.
+- This collection of fastboot flashing scripts is designed for flashing stock [Nothing OS firmware](https://github.com/spike0en/nothing_archive) on [Nothing](https://nothing.tech) & [CMF](https://cmf.tech) devices, supporting both Windows and bash platforms.
 - The script helps users revert to stock ROMs or unbrick devices, especially when the super partition size remains unchanged. It's useful when custom recoveries fail to flash the stock ROM due to partition issues. The script can also be adapted to flash custom ROMs that use the same partition size as the stock firmware.
 
 ---
