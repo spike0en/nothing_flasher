@@ -25,7 +25,7 @@ fi
 
 # Partition Variables
 boot_partitions="boot init_boot vendor_boot dtbo recovery"
-firmware_partitions="abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump"
+firmware_partitions="abl aop aop_config bluetooth cpucp cpucp_dtb devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem pvmfw qupfw shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump"
 logical_partitions="system system_ext product vendor system_dlkm vendor_dlkm odm"
 junk_logical_partitions="null"
 vbmeta_partitions="vbmeta_system vbmeta_vendor"
