@@ -3,7 +3,6 @@
 <img src="./logo.png" width="96" alt="Nothing Flasher Logo">
 
 [![Stars](https://img.shields.io/github/stars/spike0en/nothing_flasher?logo=github&color=D4AF37)](https://github.com/spike0en/nothing_flasher/stargazzers)
-[![Contributors](https://img.shields.io/github/contributors/spike0en/nothing_flasher?logo=github&color=9B5DE5)](https://github.com/spike0en/nothing_flasher/graphs/contributors)
 [![Forks](https://img.shields.io/github/forks/spike0en/nothing_flasher?logo=github&color=468FAF)](https://github.com/spike0en/nothing_flasher/network/members)
 
 ---
