@@ -70,6 +70,15 @@ function FlashImage {
     fi
 }
 
+function FlashSuper {
+    if ! "$fastboot" flash super super.img; then
+        RebootFastbootD
+        FlashImage "super" \ "super.img"
+    else
+        RebootFastbootD
+    fi
+}
+
 function DeleteLogicalPartition {
     if ! "$fastboot" delete-logical-partition $1; then
         if ! echo $1 | grep -q "cow"; then
@@ -187,12 +196,11 @@ case "$VBMETA_RESP" in
         ;;
 esac
 
-RebootFastbootD
-
 echo "###############################"
 echo "# FLASHING LOGICAL PARTITIONS #"
 echo "###############################"
 if [ ! -f super.img ]; then
+    RebootFastbootD
     if [ -f super_empty.img ]; then
         WipeSuperPartition
     else
@@ -202,7 +210,7 @@ if [ ! -f super.img ]; then
         FlashImage "${i}_a" \ "$i.img"
     done
 else
-    FlashImage "super" \ "super.img"
+    FlashSuper
 fi
 
 echo "####################################"
