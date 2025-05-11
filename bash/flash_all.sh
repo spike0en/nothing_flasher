@@ -265,9 +265,9 @@ CreateLogicalPartition() {
     fi
 }
 
-echo "###############################"
-echo "# Tetris Fastboot ROM Flasher #"
-echo "###############################"
+echo "######################################"
+echo "# Galaga-Tetris Fastboot ROM Flasher #"
+echo "######################################"
 echo
 
 # Check root privileges

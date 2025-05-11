@@ -2,7 +2,7 @@
 :: SPDX-License-Identifier: MIT
 
 @echo off
-title CMF Phone 1 Fastboot ROM Flasher
+title CMF Phone 1 & Phone 2 Pro Fastboot ROM Flasher
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -12,9 +12,9 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo ###############################
-echo # Tetris Fastboot ROM Flasher #
-echo ###############################
+echo ######################################
+echo # Galaga-Tetris Fastboot ROM Flasher #
+echo ######################################
 
 set boot_partitions=boot dtbo init_boot vendor_boot
 set main_partitions=odm_dlkm product system_dlkm vendor_dlkm
