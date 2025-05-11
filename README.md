@@ -23,7 +23,7 @@
 - **Phone (3a) & (3a) Pro**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/asteroids/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/asteroids/bash/flash_all.sh)
 
 ### 🔴 CMF by Nothing  
-- **Phone 1**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/tetris/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/tetris/bash/flash_all.sh)
+- **Phone (1) & Phone (2) Pro**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/bash/flash_all.sh)
 
 ---
 
