@@ -97,7 +97,6 @@ if %errorlevel% equ 1 (
     call :ErasePartition metadata
 ) else (
     echo Data wipe canceled.
-    exit /b
 )
 
 echo ############################
