@@ -70,11 +70,10 @@ function FlashImage {
 }
 
 function FlashSuper {
+    RebootBootloader
     if ! "$fastboot" flash super super.img; then
         RebootFastbootD
         FlashImage "super" \ "super.img"
-    else
-        RebootFastbootD
     fi
 }
 
@@ -195,11 +194,27 @@ case "$VBMETA_RESP" in
         ;;
 esac
 
+echo "#####################"
+echo "# FLASHING FIRMWARE #"
+echo "#####################"
+RebootFastbootD
+for i in $firmware_partitions; do
+    case "$SLOT_RESP" in
+        [yY] )
+            for s in a b; do
+                FlashImage "${i}_${s}" \ "$i.img"
+            done
+	    ;;
+	*)
+            FlashImage "${i}_a" \ "$i.img"
+	    ;;
+    esac
+done
+
 echo "###############################"
 echo "# FLASHING LOGICAL PARTITIONS #"
 echo "###############################"
 if [ ! -f super.img ]; then
-    RebootFastbootD
     if [ -f super_empty.img ]; then
         WipeSuperPartition
     else
@@ -223,22 +238,6 @@ for i in $vbmeta_partitions; do
         *)
             FlashImage "${i}_a" \ "$i.img"
             ;;
-    esac
-done
-
-echo "#####################"
-echo "# FLASHING FIRMWARE #"
-echo "#####################"
-for i in $firmware_partitions; do
-    case "$SLOT_RESP" in
-        [yY] )
-            for s in a b; do
-                FlashImage "${i}_${s}" \ "$i.img"
-            done
-	    ;;
-	*)
-            FlashImage "${i}_a" \ "$i.img"
-	    ;;
     esac
 done
 
