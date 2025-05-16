@@ -166,12 +166,10 @@ echo ####################################
 echo # FLASHING OTHER VBMETA PARTITIONS #
 echo ####################################
 for %%i in (%vbmeta_partitions%) do (
-    for %%s in (a b) do (
-        if %disable_avb% equ 1 (
-            call :FlashImage "%%i_%%s --disable-verity --disable-verification", %%i.img
-        ) else (
-            call :FlashImage "%%i_%%s", %%i.img
-        )
+    if %disable_avb% equ 1 (
+        call :FlashImage "%%i --disable-verity --disable-verification" %%i.img
+    ) else (
+        call :FlashImage %%i %%i.img
     )
 )
 
