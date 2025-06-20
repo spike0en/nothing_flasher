@@ -29,6 +29,7 @@
 
 ## Usage ⚙️:
 
+- The scripts are supported on Bash and Windows 10+ platforms.
 - Refer to [this guide](https://github.com/spike0en/nothing_archive?tab=readme-ov-file#flashing-the-stock-rom-using-fastboot-) for preparing the flashing folder with the respective stock firmware images and run the flashing script for your respective platform.
 - Alternatively, users can dump the `payload.bin` using [payload_dumper_go](https://github.com/ssut/payload-dumper-go) by unpacking a full stock firmware zip and then place the script suited to your operating system in the directory where the `*.img` files from `payload.bin` have been extracted. Finally, reboot your device to the bootloader and then run the flashing script.
 - The script can be executed by double-clicking the `flash_all.bat` file on Windows or by running the following command in a terminal on a bash-supported operating system (after navigating to the directory where the `*.img` files from `payload.bin` have been extracted):
