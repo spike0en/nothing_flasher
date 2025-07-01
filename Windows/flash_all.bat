@@ -16,12 +16,13 @@ echo ###############################
 echo # Pacman Fastboot ROM Flasher #
 echo ###############################
 
+:: Set partition variables
 set boot_partitions=boot dtbo init_boot vendor_boot
 set main_partitions=odm_dlkm product system_dlkm vendor_dlkm
 set firmware_partitions=apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp
 set logical_partitions=odm_dlkm odm vendor_dlkm product vendor system_dlkm system_ext system
 set junk_logical_partitions=null
-set vbmeta_partitions=vbmeta vbmeta_system vbmeta_vendor
+set vbmeta_partitions=vbmeta_system vbmeta_vendor
 
 :: Set working directory
 set "WORK_DIR=%~dp0"
@@ -145,12 +146,10 @@ if %errorlevel% equ 1 (
     set disable_avb=1
 )
 
-for %%s in (a b) do (
-    if %disable_avb% equ 1 (
-        call :FlashImage "vbmeta_%%s --disable-verity --disable-verification", vbmeta.img
-    ) else (
-        call :FlashImage "vbmeta_%%s", vbmeta.img
-    )
+if %disable_avb% equ 1 (
+    call :FlashImage vbmeta_a vbmeta.img --disable-verity --disable-verification
+) else (
+    call :FlashImage vbmeta_a vbmeta.img
 )
 
 :: Flash 'preloader_raw.img' separately
@@ -167,9 +166,9 @@ echo # FLASHING OTHER VBMETA PARTITIONS #
 echo ####################################
 for %%i in (%vbmeta_partitions%) do (
     if %disable_avb% equ 1 (
-        call :FlashImage "%%i --disable-verity --disable-verification" %%i.img
+        call :FlashImage %%i_a %%i.img --disable-verity --disable-verification
     ) else (
-        call :FlashImage %%i %%i.img
+        call :FlashImage %%i_a %%i.img
     )
 )
 
