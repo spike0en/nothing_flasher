@@ -286,7 +286,7 @@ main_partitions="odm_dlkm product system_dlkm vendor_dlkm"
 firmware_partitions="apusys audio_dsp ccu connsys_bt connsys_gnss connsys_wifi dpm gpueb gz lk logo mcf_ota mcupm md1img mvpu_algo pi_img scp spmfw sspm tee vcp"
 logical_partitions="odm_dlkm odm vendor_dlkm product vendor system_dlkm system_ext system"
 junk_logical_partitions="null"
-vbmeta_partitions="vbmeta vbmeta_system vbmeta_vendor"
+vbmeta_partitions="vbmeta_system vbmeta_vendor"
 
 # Set working directory
 WORK_DIR=$(dirname "$(realpath "$0")")
@@ -414,30 +414,24 @@ if read_choice "Disable android verified boot (AVB)? If unsure, say N. Bootloade
     echo "[WARNING] Android Verified Boot will be disabled."
 fi
 
-for s in a b; do
-    if [[ "$disable_avb" -eq 1 ]]; then
-        FlashImage "vbmeta_${s} --disable-verity --disable-verification" "vbmeta.img"
-    else
-        FlashImage "vbmeta_${s}" "vbmeta.img"
-    fi
-done
+if [[ "$disable_avb" -eq 1 ]]; then
+    FlashImage "vbmeta_a --disable-verity --disable-verification" "vbmeta.img"
+else
+    FlashImage "vbmeta_a" "vbmeta.img"
+fi
 echo
 
 echo "####################################"
 echo "# FLASHING OTHER VBMETA PARTITIONS #"
 echo "####################################"
 for i in $vbmeta_partitions; do
-    if [[ "$i" == "vbmeta" ]]; then
-        continue
+    if [[ "$disable_avb" -eq 1 ]]; then
+        FlashImage "${i}_a --disable-verity --disable-verification" "${i}.img"
+    else
+        FlashImage "${i}_a" "${i}.img"
     fi
-    for s in a b; do
-        if [[ "$disable_avb" -eq 1 ]]; then
-            FlashImage "${i}_${s} --disable-verity --disable-verification" "${i}.img"
-        else
-            FlashImage "${i}_${s}" "${i}.img"
-        fi
-    done
 done
+
 echo
 
 echo "###############################"
