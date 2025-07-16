@@ -2,7 +2,7 @@
 :: SPDX-License-Identifier: MIT
 
 @echo off
-title Nothing Phone 2 Fastboot ROM Flasher
+title Nothing Phone 3 Fastboot ROM Flasher
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -12,14 +12,14 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo #############################
-echo # Pong Fastboot ROM Flasher #
-echo #############################
+echo ################################
+echo # Metroid Fastboot ROM Flasher #
+echo ################################
 
 :: Set partition variables
-set boot_partitions=boot vendor_boot dtbo recovery
-set firmware_partitions=abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump
-set logical_partitions=system system_ext product vendor vendor_dlkm odm
+set boot_partitions=boot dtbo init_boot recovery vendor_boot
+set firmware_partitions=abl aop aop_config bluetooth cpucp cpucp_dtb devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti pvmfw qupfw shrm soccp_dcd soccp_debug tz uefi uefisecapp xbl xbl_config xbl_ramdump
+set logical_partitions=odm product system system_dlkm system_ext vendor vendor_dlkm
 set junk_logical_partitions=null
 set vbmeta_partitions=vbmeta_system vbmeta_vendor
 

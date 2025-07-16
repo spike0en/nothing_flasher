@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-echo "#############################"
-echo "# Pong Fastboot ROM Flasher #"
-echo "#############################"
+echo "################################"
+echo "# Metroid Fastboot ROM Flasher #"
+echo "################################"
 
 ##----------------------------------------------------------##
 if [ ! -d "$(pwd)/platform-tools" ]; then
@@ -24,9 +24,9 @@ if [ ! -f "$fastboot" ] || [ ! -x "$fastboot" ]; then
 fi
 
 # Partition Variables
-boot_partitions="boot vendor_boot dtbo recovery"
-firmware_partitions="abl aop aop_config bluetooth cpucp devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti qupfw qweslicstore shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump"
-logical_partitions="system system_ext product vendor vendor_dlkm odm"
+boot_partitions="boot dtbo init_boot recovery vendor_boot"
+firmware_partitions="abl aop aop_config bluetooth cpucp cpucp_dtb devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti pvmfw qupfw shrm soccp_dcd soccp_debug tz uefi uefisecapp xbl xbl_config xbl_ramdump"
+logical_partitions="odm product system system_dlkm system_ext vendor vendor_dlkm"
 junk_logical_partitions="null"
 vbmeta_partitions="vbmeta_system vbmeta_vendor"
 
