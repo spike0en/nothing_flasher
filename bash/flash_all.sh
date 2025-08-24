@@ -6,18 +6,22 @@ echo "#    t.me/s/Nothing_Archive     #"
 echo "#################################"
 
 ##----------------------------------------------------------##
-if [ ! -d "$(pwd)/platform-tools" ]; then
+if [ ! -d "$(pwd)/platform-tools-r33.0.0" ]; then
     if [[ $OSTYPE == 'darwin'* ]]; then
-        fastboot_dl="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip"
+        fastboot_dl="https://dl.google.com/android/repository/platform-tools_r33.0.0-darwin.zip"
     else
-        fastboot_dl="https://dl.google.com/android/repository/platform-tools-latest-linux.zip"
+        fastboot_dl="https://dl.google.com/android/repository/platform-tools_r33.0.0-linux.zip"
     fi
-    curl -L "$fastboot_dl" -o "$(pwd)/platform-tools-latest.zip"
-    unzip "$(pwd)/platform-tools-latest.zip"
-    rm "$(pwd)/platform-tools-latest.zip"
+    curl -L "$fastboot_dl" -o "$(pwd)/platform-tools-r33.0.0.zip"
+    unzip "$(pwd)/platform-tools-r33.0.0.zip"
+    rm "$(pwd)/platform-tools-r33.0.0.zip"
+
+    if [ -d "$(pwd)/platform-tools" ]; then
+        mv "$(pwd)/platform-tools" "$(pwd)/platform-tools-r33.0.0"
+    fi
 fi
 
-fastboot="$(pwd)/platform-tools/fastboot"
+fastboot="$(pwd)/platform-tools-r33.0.0/fastboot"
 
 if [ ! -f "$fastboot" ] || [ ! -x "$fastboot" ]; then
     echo "Fastboot cannot be executed, exiting"
