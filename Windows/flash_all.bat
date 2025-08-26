@@ -2,7 +2,7 @@
 :: SPDX-License-Identifier: MIT
 
 @echo off
-title CMF Phone 1 & Phone 2 Pro Fastboot ROM Flasher
+title CMF Phone 1 - Phone 2 Pro Fastboot ROM Flasher
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -598,4 +598,5 @@ if %errorlevel% equ 2 (
     exit
 )
 exit /b
+
 
