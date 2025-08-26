@@ -67,6 +67,21 @@ if %errorlevel% equ 2 (
 
 echo All pre-requirements met! Proceeding...
 
+:: -------------------------------------
+::  FILE INTEGRITY CHECKS [RECOMMENDED]
+:: -------------------------------------
+call :PreHashVerificationPrompt
+if %errorlevel% equ 0 (
+    call :VerifyImageHashes
+    if %errorlevel% neq 0 (
+        echo [ABORTED] Image validation failed or canceled by user.
+        pause
+        exit /b 1
+    )
+) else (
+    echo [INFO] Skipping hash verification as requested. Proceeding without validation...
+)
+
 :: ----------------------------------
 ::  PLATFORM TOOLS SETUP & VALIDATION
 :: ----------------------------------
@@ -81,6 +96,7 @@ echo #############################
 echo # CHECKING FASTBOOT DEVICES #
 echo #############################
 call :CheckFastbootDevices
+if errorlevel 1 exit /b 1
 
 echo #############################
 echo # CHANGING ACTIVE SLOT TO A #
@@ -204,6 +220,181 @@ echo You may now optionally re-lock the bootloader if you haven't disabled andro
 pause
 exit
 
+:PreHashVerificationPrompt
+echo.
+echo #########################
+echo # IMAGE INTEGRITY CHECK #
+echo #########################
+echo This step verifies file integrity and detects missing or corrupted images before flashing.
+echo.
+echo Download the provided .sha256 checksum file in release assets
+echo From: https://github.com/spike0en/nothing_archive/releases
+echo Move the same to: %CD%
+echo Example: Pong_V3.2-250708-2227-hash.sha256
+echo Filenames can vary based on NOS build and device model
+echo.
+choice /m "Begin (Y) or skip hash (N) verification"
+if %errorlevel% equ 1 (
+    exit /b 0
+) else (
+    exit /b 1
+)
+
+:VerifyImageHashes
+setlocal enabledelayedexpansion
+
+:CheckForSha
+dir /b *.sha256 >nul 2>&1
+if errorlevel 1 (
+    echo.
+    echo =================================================================
+    echo [WARNING] No .sha256 checksum files found in the directory!
+    echo =================================================================
+    choice /m "Do you want to proceed without hash verification?" /c YN
+
+    rem IMPORTANT: In CHOICE, Y = errorlevel 1, N = errorlevel 2
+    if errorlevel 2 (
+        echo.
+        echo [INFO] Please place the required .sha256 checksum files in:
+        echo   %CD%
+        echo and then press any key to retry...
+        pause >nul
+        goto :CheckForSha
+    )
+    if errorlevel 1 (
+        echo Proceeding without hash verification...
+        endlocal
+        exit /b 0
+    )
+)
+
+set /a total=0
+set /a valid=0
+set /a invalid=0
+set /a missing=0
+set "invalidList="
+set "missingList="
+
+echo.
+echo ===============================
+echo Checking Image Hashes...
+echo ===============================
+
+for %%F in (*.sha256) do (
+    echo Checking: %%F
+    echo ------------------------------------------
+
+    for /f "usebackq delims=" %%L in ("%%F") do (
+        set "line=%%L"
+        if not "!line!"=="" (
+            set "hash="
+            set "file="
+            for /f "tokens=1" %%H in ("!line!") do (
+                set "hash=%%H"
+            )
+            set "file=!line:* *=!"
+            set "hash=!hash: =!"
+            set "hash=!hash:~0,64!"
+
+            set /a total+=1
+
+            if exist "!file!" (
+                set "actual="
+                for /f "tokens=1" %%X in ('CertUtil -hashfile "!file!" SHA256 ^| find /i /v "SHA256" ^| find /i /v "CertUtil"') do (
+                    set "actual=%%X"
+                )
+                set "actual=!actual: =!"
+                set "actual=!actual:~0,64!"
+
+                if /i "!hash!"=="!actual!" (
+                    echo [VALID]     !file!
+                    set /a valid+=1
+                ) else (
+                    echo [INVALID]   !file!
+                    set /a invalid+=1
+                    set "invalidList=!invalidList!!file!;"
+                )
+            ) else (
+                echo [MISSING]   !file!
+                set /a missing+=1
+                set "missingList=!missingList!!file!;"
+            )
+        )
+    )
+)
+
+echo ------------------------------------------
+echo.
+echo Final Results
+echo ==============================
+echo Total .img files    = !total!
+echo Valid images        = !valid!
+echo Invalid images      = !invalid!
+echo Missing images      = !missing!
+echo.
+
+if !invalid! GTR 0 (
+    echo List of Invalid Images:
+    set /a count=0
+    for %%I in (!invalidList!) do (
+        set /a count+=1
+        echo   !count!. %%I
+    )
+    echo.
+)
+
+if !missing! GTR 0 (
+    echo List of Missing Images:
+    set /a count=0
+    for %%M in (!missingList!) do (
+        set /a count+=1
+        echo   !count!. %%M
+    )
+    echo.
+)
+
+if !invalid! GTR 0 (
+    echo [WARNING] One or more image files are invalid.
+)
+if !missing! GTR 0 (
+    echo [WARNING] One or more image files are missing.
+)
+
+if !invalid! GTR 0 goto :ConfirmProceed
+if !missing! GTR 0 goto :ConfirmProceed
+
+echo All image files validated successfully.
+endlocal
+exit /b 0
+
+:ConfirmProceed
+choice /m "Some files are invalid or missing. Do you want to proceed anyway?"
+if %errorlevel% equ 1 (
+    rem User chose Yes → continue
+    endlocal
+    exit /b 0
+)
+
+rem User chose No → show retry/exit menu
+echo.
+echo ====================================================
+echo [INFO] Choose an option:
+echo   1. Retry validation (after fixing files)
+echo   2. Exit flasher
+echo ====================================================
+set /p choice="Enter 1 or 2: "
+
+if "%choice%"=="1" (
+    echo [INFO] Retrying validation...
+    endlocal
+    goto :VerifyImageHashes
+) else (
+    echo [ABORTED] Image validation failed or canceled by user.
+    endlocal
+    exit /b 1
+)
+exit /b 0
+
 :PlatformToolsSetup
 echo #############################
 echo # SETTING UP PLATFORM TOOLS #
@@ -279,35 +470,45 @@ if %errorlevel% neq 0 (
 exit /b
 
 :CheckFastbootDevices
-:: Clear any previous DEVICE_ID
+setlocal
+set "RETRY_COUNT=1"
+set "MAX_RETRIES=3"
+
+:CheckFastbootDevices
+setlocal
+set "RETRY_COUNT=1"
+set "MAX_RETRIES=3"
+
+:CheckFastbootLoop
 set "DEVICE_ID="
 
 :: Run fastboot devices and capture output
-for /f "tokens=1" %%A in ('%fastboot% devices 2^>nul') do (
+for /f "tokens=1" %%A in ('"%fastboot%" devices 2^>nul') do (
     set "DEVICE_ID=%%A"
 )
 
-:: Check if fastboot executed successfully
-if %errorlevel% neq 0 (
-    echo [ERROR] Fastboot command failed to execute.
-    echo - Ensure fastboot.exe is available and your environment is set up correctly.
-    pause
-    exit /b 1
-)
-
-:: Check if a device was detected
-if not defined DEVICE_ID (
-    echo [ERROR] No fastboot device detected!
+if defined DEVICE_ID (
+    echo [SUCCESS] Fastboot device detected: %DEVICE_ID%
+    endlocal
+    exit /b 0
+) else (
+    echo [ERROR] No fastboot device detected! Attempt %RETRY_COUNT% of %MAX_RETRIES%
     echo - Ensure your device is in fastboot mode.
-    echo - Check USB connection and try a different port.
-    echo - Install proper drivers if not already installed.
-    echo - Run "fastboot devices" manually to verify.
-    pause
-    exit /b 1
-)
+    echo - Check USB connection / try a different cable or port.
+    echo - Install or update proper fastboot drivers.
+    echo.
 
-echo [SUCCESS] Fastboot device detected: %DEVICE_ID%
-exit /b
+    if %RETRY_COUNT% lss %MAX_RETRIES% (
+        set /a RETRY_COUNT+=1
+        pause
+        goto :CheckFastbootLoop
+    ) else (
+        echo [FAILED] No device detected after %MAX_RETRIES% attempts.
+        echo Please fix the above issues and re-run the flasher.
+        endlocal
+        exit /b 1
+    )
+)
 
 :SetActiveSlot
 %fastboot% set_active a
