@@ -30,7 +30,7 @@ PlatformToolsSetup() {
     echo "#############################"
     if [[ ! -d "platform-tools-latest" ]]; then
         echo "Platform tools not found. Downloading..."
-        if curl --fail --location https://dl.google.com/android/repository/platform-tools-latest-linux.zip -o platform-tools-latest.zip; then
+        if curl --fail --location https://dl.google.com/android/repository/platform-tools-latest-$(uname).zip -o platform-tools-latest.zip; then
             echo "Platform tools downloaded successfully."
             UnZipFile "platform-tools-latest.zip" "platform-tools-latest"
             echo "Platform tools extracted successfully."
