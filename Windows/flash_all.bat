@@ -310,7 +310,7 @@ echo [SUCCESS] Fastboot device detected: %DEVICE_ID%
 exit /b
 
 :SetActiveSlot
-%fastboot% --set-active=a
+%fastboot% set_active a
 if %errorlevel% neq 0 (
     echo Error occured while switching to slot A. Aborting
     pause
