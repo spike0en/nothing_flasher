@@ -31,7 +31,7 @@ junk_logical_partitions="null"
 vbmeta_partitions="vbmeta_system vbmeta_vendor"
 
 function SetActiveSlot {
-    if ! "$fastboot" --set-active=a; then
+    if ! "$fastboot" set_active a; then
         echo "Error occured while switching to slot A. Aborting"
         exit 1
     fi
