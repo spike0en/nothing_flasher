@@ -399,14 +399,14 @@ exit /b 0
 echo #############################
 echo # SETTING UP PLATFORM TOOLS #
 echo #############################
-if not exist platform-tools_r33.0.0-windows (
+if not exist platform-tools_r36.0.0-windows (
     echo Platform tools not found. Downloading...
-    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools_r33.0.0-windows.zip -o platform-tools_r33.0.0-windows.zip
-    if exist platform-tools_r33.0.0-windows.zip (
+    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools_r36.0.0-windows.zip -o platform-tools_r36.0.0-windows.zip
+    if exist platform-tools_r36.0.0-windows.zip (
         echo Platform tools downloaded successfully.
-        call :UnZipFile "%~dp0platform-tools_r33.0.0-windows.zip" "%~dp0platform-tools_r33.0.0-windows"
+        call :UnZipFile "%~dp0platform-tools_r36.0.0-windows.zip" "%~dp0platform-tools_r36.0.0-windows"
         echo Platform tools extracted successfully.
-        del /f /q platform-tools_r33.0.0-windows.zip
+        del /f /q platform-tools_r36.0.0-windows.zip
     ) else (
         echo Error: Failed to download platform tools.
         exit /b 1
@@ -420,7 +420,7 @@ exit /b
 echo ################################
 echo # CHECKING FASTBOOT EXECUTABLE # 
 echo ################################
-set "fastboot=.\platform-tools_r33.0.0-windows\platform-tools\fastboot.exe"
+set "fastboot=.\platform-tools_r36.0.0-windows\platform-tools\fastboot.exe"
 
 :: Ensure fastboot.exe exists
 if not exist "%fastboot%" (
