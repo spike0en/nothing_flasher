@@ -35,9 +35,26 @@ logical_partitions="system system_ext product vendor odm"
 dlkm_partitions="system_dlkm vendor_dlkm"
 junk_logical_partitions="null"
 
+function RebootBootloader {
+    echo "###########################"
+    echo "# REBOOTING TO BOOTLOADER #"       
+    echo "###########################"
+    if ! "$fastboot" reboot bootloader; then
+        echo "Error occured while rebooting to bootloader. Aborting"
+        exit 1
+    fi
+}
+
 function SetActiveSlot {
-    if ! "$fastboot" set_active a; then
-        echo "Error occured while switching to slot A. Aborting"
+    if ! "$fastboot" --set-active=${1}; then
+        echo "Error occured while switching to slot ${1}. Aborting"
+        exit 1
+    fi
+}
+
+function SwapSlot {
+    if ! "$fastboot" --set-active=other; then
+        echo "Error occured while switching to inactive slot. Aborting"
         exit 1
     fi
 }
@@ -69,6 +86,13 @@ function RebootFastbootD {
 
 function FlashImage {
     if ! "$fastboot" flash $1 $2; then
+        read -rp "Flashing$2 failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
+        handle_fastboot_error
+    fi
+}
+
+function FlashImageToOther {
+    if ! "$fastboot" flash $1 $2 --slot=${INACTIVE_SLOT}; then
         read -rp "Flashing$2 failed, Continue? If unsure say N, Pressing Enter key without any input will continue the script. (Y/N)" FASTBOOT_ERROR
         handle_fastboot_error
     fi
@@ -124,26 +148,32 @@ function WipeSuperPartition {
     fi
 }
 
-function RebootBootloader {
-    echo "###########################"
-    echo "# REBOOTING TO BOOTLOADER #"       
-    echo "###########################"
-    if ! "$fastboot" reboot bootloader; then
-        echo "Error occured while rebooting to bootloader. Aborting"
-        exit 1
+function isFastbootD {
+    fastboot getvar is-userspace 2>&1 | grep -q "yes"
+}
+
+function GetSlot {
+    ACTIVE_SLOT=$("$fastboot" getvar current-slot 2>&1 | head -n1 | rev | cut -c1)
+    if [ -z "$ACTIVE_SLOT" ]; then 
+        echo active slot not set! Aborting...
+    fi
+    if [ "$ACTIVE_SLOT" = "a" ]; then 
+        INACTIVE_SLOT="b"
+    else 
+        INACTIVE_SLOT="a"
     fi
 }
+
 ##----------------------------------------------------------##
 
 echo "#############################"
 echo "# CHECKING FASTBOOT DEVICES #"
 echo "#############################"
 "$fastboot" devices
-
-echo "#############################"
-echo "# CHANGING ACTIVE SLOT TO A #"
-echo "#############################"
-SetActiveSlot
+GetSlot
+if ! isFastbootD; then
+    RebootFastbootD
+fi
 
 echo "###################"
 echo "# FORMATTING DATA #"
@@ -160,49 +190,32 @@ esac
 echo "############################"
 echo "# FLASHING BOOT PARTITIONS #"
 echo "############################"
-read -rp "Flash images on both slots? If unsure, say N. (Y/N) " SLOT_RESP
 for i in $boot_partitions; do
-    case "$SLOT_RESP" in
-        [yY] )
-            for s in a b; do
-                FlashImage "${i}_${s}" \ "$i.img"
-            done
-	    ;;
-	*)
-            FlashImage "${i}_a" \ "$i.img"
-	    ;;
-    esac
+    FlashImageToOther "${i}" \ "$i.img"
 done
 
 echo "###################"
 echo "# FLASHING VBMETA #"
 echo "###################"
 for i in $vbmeta_partitions; do
-    FlashImage "${i}_a" \ "$i.img"
+    FlashImageToOther "${i}" \ "$i.img"
 done
 
 echo "################"
-echo "# FLASHING DLKM  #"
+echo "# FLASHING DLKM #"
 echo "################"
-RebootFastbootD
 for i in $dlkm_partitions; do
-    FlashImage "${i}_a" \ "$i.img"
+    FlashImage "${i}_${INACTIVE_SLOT}" \ "$i.img"
 done
 
 echo "#####################"
 echo "# FLASHING FIRMWARE #"
 echo "#####################"
+if ! isFastbootD; then 
+    RebootFastbootD
+fi
 for i in $firmware_partitions; do
-    case "$SLOT_RESP" in
-        [yY] )
-            for s in a b; do
-                FlashImage "${i}_${s}" \ "$i.img"
-            done
-	    ;;
-	*)
-            FlashImage "${i}_a" \ "$i.img"
-	    ;;
-    esac
+        FlashImageToOther "${i}" \ "$i.img"
 done
 
 echo "###############################"
@@ -215,12 +228,16 @@ if [ ! -f super.img ]; then
         ResizeLogicalPartition
     fi
     for i in $logical_partitions; do
-        FlashImage "${i}_a" \ "$i.img"
+        FlashImageToOther "${i}" \ "$i.img"
     done
 else
     FlashSuper
 fi
 
+echo "#################################"
+echo "# CHANGING ACTIVE SLOT TO ${INACTIVE_SLOT} #"
+echo "#################################"
+SwapSlot
 
 echo "#############"
 echo "# REBOOTING #"
