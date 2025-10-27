@@ -2,6 +2,7 @@
 
 <img src="./logo.png" width="96" alt="Nothing Flasher Logo">
 
+[![Hits](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgithub.com%2Fspike0en%2Fnothing_flasher&label=Hits&icon=github&color=%23b02a37&labelColor=2E2E3F)](https://github.com/spike0en/nothing_flasher)
 [![Stars](https://img.shields.io/github/stars/spike0en/nothing_flasher?logo=github&color=D4AF37)](https://github.com/spike0en/nothing_flasher/stargazzers)
 [![Forks](https://img.shields.io/github/forks/spike0en/nothing_flasher?logo=github&color=468FAF)](https://github.com/spike0en/nothing_flasher/network/members)
 
