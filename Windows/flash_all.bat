@@ -99,10 +99,25 @@ echo #############################
 call :CheckFastbootDevices
 if errorlevel 1 exit /b 1
 
-echo #############################
-echo # CHANGING ACTIVE SLOT TO A #
-echo #############################
-call :SetActiveSlot
+:: -------------------------------
+:: Determine active-inactive slot
+:: -------------------------------
+
+%fastboot% getvar current-slot 2>&1 | find /c "current-slot: a" > tmpFile.txt
+set /p is_a_active= < tmpFile.txt
+del /f /q tmpFile.txt
+
+:: Set slot variables
+if %is_a_active% equ 1 (
+    set active_slot=a
+    set inactive_slot=b
+) else (
+    set active_slot=b
+    set inactive_slot=a
+)
+
+echo Active slot: %active_slot%
+echo Inactive slot: %inactive_slot%
 
 echo ###################
 echo # FORMATTING DATA #
@@ -119,29 +134,15 @@ if %errorlevel% equ 1 (
 echo ############################
 echo # FLASHING BOOT PARTITIONS #
 echo ############################
-set slot=a
-choice /m "Flash images on both slots? If unsure, say N."
-if %errorlevel% equ 1 (
-    set slot=all
-)
-
-if %slot% equ all (
-    for %%i in (%boot_partitions%) do (
-        for %%s in (a b) do (
-            call :FlashImage %%i_%%s, %%i.img
-        )
-    ) 
-) else (
-    for %%i in (%boot_partitions%) do (
-        call :FlashImage %%i_%slot%, %%i.img
-    )
+for %%i in (%boot_partitions%) do (
+    call :FlashImage %%i_%inactive_slot%, %%i.img
 )
 
 echo ###################
 echo # FLASHING VBMETA #
 echo ###################
 for %%i in (%vbmeta_partitions%) do (
-    call :FlashImage %%i_a, %%i.img
+    call :FlashImage %%i_%inactive_slot%, %%i.img
 )
 
 echo #################
@@ -149,22 +150,15 @@ echo # FLASHING DLKM #
 echo #################
 call :RebootFastbootD
 for %%i in (%dlkm_partitions%) do (
-    call :FlashImage %%i_a, %%i.img
+    call :FlashImage %%i_%inactive_slot%, %%i.img
 )
 
 echo #####################
 echo # FLASHING FIRMWARE #
 echo #####################
-if %slot% equ all (
-    for %%i in (%firmware_partitions%) do (
-        for %%s in (a b) do (
-            call :FlashImage %%i_%%s, %%i.img
-        )
-    )
-) else (
-    for %%i in (%firmware_partitions%) do (
-        call :FlashImage %%i_%slot%, %%i.img
-    )
+for %%i in (%firmware_partitions%) do (
+    call :FlashImage %%i_%active_slot%, %%i.img
+    call :FlashImage %%i_%inactive_slot%, %%i.img
 )
 
 echo ###############################
@@ -177,11 +171,16 @@ if not exist super.img (
         call :ResizeLogicalPartition
     )
     for %%i in (%logical_partitions%) do (
-        call :FlashImage %%i_a, %%i.img
+        call :FlashImage %%i_%inactive_slot%, %%i.img
     )
 ) else (
     call :FlashSuper
 )
+
+echo ##################
+echo # SWITCHING TO %inactive_slot% #
+echo ##################
+call :SwapSlot
 
 echo #############
 echo # REBOOTING #
@@ -489,12 +488,12 @@ if defined DEVICE_ID (
     )
 )
 
-:SetActiveSlot
-%fastboot% set_active a
+:SwapSlot
+%fastboot% --set-active=other
 if %errorlevel% neq 0 (
-    echo Error occured while switching to slot A. Aborting
+    echo Error occured while switching to inactive slot. Aborting
     pause
-    exit
+    exit /b 1
 )
 exit /b
 
