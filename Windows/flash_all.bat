@@ -134,6 +134,7 @@ if %errorlevel% equ 1 (
 echo ############################
 echo # FLASHING BOOT PARTITIONS #
 echo ############################
+call :RebootFastbootD
 for %%i in (%boot_partitions%) do (
     call :FlashImage %%i_%inactive_slot%, %%i.img
 )
@@ -148,7 +149,6 @@ for %%i in (%vbmeta_partitions%) do (
 echo #################
 echo # FLASHING DLKM #
 echo #################
-call :RebootFastbootD
 for %%i in (%dlkm_partitions%) do (
     call :FlashImage %%i_%inactive_slot%, %%i.img
 )
@@ -602,3 +602,4 @@ if %errorlevel% equ 2 (
     exit
 )
 exit /b
+
