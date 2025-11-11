@@ -99,6 +99,11 @@ echo #############################
 call :CheckFastbootDevices
 if errorlevel 1 exit /b 1
 
+echo ###############################
+echo #     SLOT INFORMATION       #
+echo ###############################
+call :ShowSlotInfo
+
 echo #############################
 echo # CHANGING ACTIVE SLOT TO A #
 echo #############################
@@ -489,6 +494,22 @@ if defined DEVICE_ID (
     )
 )
 
+:ShowSlotInfo
+for /f "tokens=2 delims=: " %%a in ('%fastboot% getvar current-slot 2^>^&1 ^| find "current-slot:"') do (
+    set current_slot=%%a
+)
+
+if /i "%current_slot%"=="a" (
+    echo Active slot   : a
+    echo Inactive slot : b
+) else if /i "%current_slot%"=="b" (
+    echo Active slot   : b
+    echo Inactive slot : a
+) else (
+    echo Unable to determine active slot.
+)
+exit /b
+
 :SetActiveSlot
 %fastboot% set_active a
 if %errorlevel% neq 0 (
@@ -603,3 +624,4 @@ if %errorlevel% equ 2 (
     exit
 )
 exit /b
+
