@@ -3,6 +3,7 @@
 
 @echo off
 title Nothing Phone 3a Series Fastboot ROM Flasher
+setlocal enabledelayedexpansion
 
 :: Ensure the script runs as administrator
 net session >nul 2>&1
@@ -120,14 +121,16 @@ echo ############################
 echo # FLASHING BOOT PARTITIONS #
 echo ############################
 for %%i in (%boot_partitions%) do (
-    call :FlashImageToOther %%i %%i.img
+    set "target_partition=%%i_%inactive_slot%"
+    call :FlashImage !target_partition! %%i.img
 )
 
 echo ###################
 echo # FLASHING VBMETA #
 echo ###################
 for %%i in (%vbmeta_partitions%) do (
-    call :FlashImageToOther %%i %%i.img
+    set "target_partition=%%i_%inactive_slot%"
+    call :FlashImage !target_partition! %%i.img
 )
 
 echo #################
@@ -135,7 +138,8 @@ echo # FLASHING DLKM #
 echo #################
 call :RebootFastbootD
 for %%i in (%dlkm_partitions%) do (
-    call :FlashImageToOther %%i %%i.img
+    set "target_partition=%%i_%inactive_slot%"
+    call :FlashImage !target_partition! %%i.img
 )
 
 echo #####################
@@ -156,9 +160,12 @@ if not exist super.img (
     ) else (
         call :ResizeLogicalPartition
     )
+
     for %%i in (%logical_partitions%) do (
-        call :FlashImageToOther %%i %%i.img
+        set "target_partition=%%i_%inactive_slot%"
+        call :FlashImage !target_partition! %%i.img
     )
+
 ) else (
     call :FlashSuper
 )
@@ -182,7 +189,6 @@ echo ########
 echo Stock firmware restored.
 
 pause
-exit
 
 :PreHashVerificationPrompt
 echo.
@@ -438,11 +444,6 @@ setlocal
 set "RETRY_COUNT=1"
 set "MAX_RETRIES=3"
 
-:CheckFastbootDevices
-setlocal
-set "RETRY_COUNT=1"
-set "MAX_RETRIES=3"
-
 :CheckFastbootLoop
 set "DEVICE_ID="
 
@@ -475,19 +476,29 @@ if defined DEVICE_ID (
 )
 
 :ShowSlotInfo
+set "current_slot="
 for /f "tokens=2 delims=: " %%a in ('%fastboot% getvar current-slot 2^>^&1 ^| find "current-slot:"') do (
     set current_slot=%%a
 )
 
+:: Normalize slot (fastboot sometimes returns "a" or "_a" or "a ")
+set "current_slot=%current_slot:_=%"
+set "current_slot=%current_slot: =%"
+
 if /i "%current_slot%"=="a" (
+    set "active_slot=a"
+    set "inactive_slot=b"
     echo Active slot   : a
     echo Inactive slot : b
 ) else if /i "%current_slot%"=="b" (
+    set "active_slot=b"
+    set "inactive_slot=a"
     echo Active slot   : b
     echo Inactive slot : a
 ) else (
-    echo Unable to determine active slot.
+    echo [ERROR] Unable to determine active slot.
 )
+
 exit /b
 
 :SwapSlot
@@ -513,13 +524,6 @@ exit /b
 %fastboot% flash %~1 %~2
 if %errorlevel% neq 0 (
     call :Choice "Flashing %~2 failed"
-)
-exit /b
-
-:FlashImageToOther
-%fastboot% flash --slot=other %~1 %~2
-if %errorlevel% neq 0 (
-    call :Choice "Flashing %~2 to other slot failed"
 )
 exit /b
 
@@ -611,4 +615,3 @@ if %errorlevel% equ 2 (
     exit
 )
 exit /b
-
