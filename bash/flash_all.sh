@@ -205,6 +205,8 @@ echo "################"
 echo "# FLASHING DLKM #"
 echo "################"
 for i in $dlkm_partitions; do
+    "$fastboot" delete-logical-partition "${i}_${INACTIVE_SLOT}"
+    CreateLogicalPartition "${i}_${INACTIVE_SLOT}" \ "1"
     FlashImage "${i}_${INACTIVE_SLOT}" \ "$i.img"
 done
 
