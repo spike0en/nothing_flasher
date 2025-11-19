@@ -139,6 +139,9 @@ echo #################
 call :RebootFastbootD
 for %%i in (%dlkm_partitions%) do (
     set "target_partition=%%i_%inactive_slot%"
+    %fastboot% delete-logical-partition !target_partition!
+    call :CreateLogicalPartition !target_partition! 1
+    echo Flashing !target_partition! with %%i.img...
     call :FlashImage !target_partition! %%i.img
 )
 
@@ -615,3 +618,4 @@ if %errorlevel% equ 2 (
     exit
 )
 exit /b
+
