@@ -53,7 +53,7 @@ function SetActiveSlot {
 }
 
 function SwapSlot {
-    if ! "$fastboot" --set-active=other; then
+    if ! "$fastboot" --set-active=${INACTIVE_SLOT}; then
         echo "Error occured while switching to inactive slot. Aborting"
         exit 1
     fi
