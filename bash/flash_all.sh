@@ -149,7 +149,7 @@ function WipeSuperPartition {
 }
 
 function isFastbootD {
-    fastboot getvar is-userspace 2>&1 | grep -q "yes"
+    "$fastboot" getvar is-userspace 2>&1 | grep -q "yes"
 }
 
 function GetSlot {
