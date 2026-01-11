@@ -236,6 +236,7 @@ else
     FlashSuper
 fi
 
+Getslot
 echo "#################################"
 echo "# CHANGING ACTIVE SLOT TO ${INACTIVE_SLOT} #"
 echo "#################################"
