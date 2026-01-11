@@ -17,5 +17,4 @@ bash flash_all.sh
 ### Notes
 - Windows 10+ supported.
 - For a bash supporting operating system curl and unzip utilities should be installed on your system.
-- The script flashes the rom on slot A and it destroys the partitions on slot B to create space for the partitions which are being flashed on slot A. This is the reason why we are not including the ability to switch slots as the partitions would get destroyed on the inactive slot which is why the script flashes the partitions on the primary slot which is slot A.
-
+- The script flashes the ROM on the inactive slot and switches the slot before rebooting. This preserves compatibility while reverting back from custom firmware based on the 6.6 kernel, which differs from that of the stock version.
