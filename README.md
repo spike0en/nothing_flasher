@@ -47,7 +47,7 @@
 
 - A working internet connection is required to download the latest version of `platform-tools` if it's not already present in the working directory.
 - Make sure to download the script that corresponds to your device model's codename and platform (Windows or bash).
-- The script flashes the ROM on slot A and erases the partitions on slot B to free up space for the new partitions. Slot switching is not included, as the inactive slot would lose data. The script focuses on flashing partitions to slot A.
+- The script flashes the ROM on slot A and erases the partitions on slot B to free up space for the new partitions. Slot switching is not included, as the inactive slot would lose data. The script focuses on flashing partitions to slot A. However there remains an exclusion for Phone (3a) Series where the rom is flashed to the inactive slot and switched to the same before rebooting in order to ensure compatibility with 6.6 kernels used for custom ROM(s), which is different from that of stock firmware.
 - Ensure that you have working [Google USB drivers](https://developer.android.com/studio/run/win-usb) installed before running the script.
 - Scripts must be executed in bootloader mode with fastboot access. Also, verify that the `Android Bootloader Interface` is listed in your Windows Device Manager.
 - Do not reboot your device into the system before confirming all partitions have been successfully flashed.
