@@ -236,7 +236,7 @@ else
     FlashSuper
 fi
 
-Getslot
+GetSlot
 echo "#################################"
 echo "# CHANGING ACTIVE SLOT TO ${INACTIVE_SLOT} #"
 echo "#################################"
