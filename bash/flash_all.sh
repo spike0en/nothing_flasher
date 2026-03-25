@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "##################################"
-echo "# Asteroids Fastboot ROM Flasher #"
+echo "#  Frogger Fastboot ROM Flasher  #"
 echo "##################################"
 
 ##----------------------------------------------------------##
@@ -28,10 +28,10 @@ if [ ! -f "$fastboot" ] || [ ! -x "$fastboot" ]; then
 fi
 
 # Partition Variables
-boot_partitions="boot init_boot vendor_boot dtbo recovery"
+boot_partitions="boot dtbo init_boot recovery vendor_boot"
 vbmeta_partitions="vbmeta vbmeta_system vbmeta_vendor"
 firmware_partitions="abl aop aop_config bluetooth cpucp cpucp_dtb devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem pvmfw qupfw shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump"
-logical_partitions="system system_ext product vendor odm"
+logical_partitions="odm product system system_ext vendor"
 dlkm_partitions="system_dlkm vendor_dlkm"
 junk_logical_partitions="null"
 
