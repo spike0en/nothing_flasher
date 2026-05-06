@@ -2,7 +2,7 @@
 :: SPDX-License-Identifier: MIT
 
 @echo off
-title Nothing Phone 4a Fastboot ROM Flasher
+title Nothing Phone 4a Pro Fastboot ROM Flasher
 setlocal enabledelayedexpansion
 
 :: Ensure the script runs as administrator
@@ -13,14 +13,14 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo ##################################
-echo #  Frogger Fastboot ROM Flasher  #
-echo ##################################
+echo ###################################
+echo # FroggerPro Fastboot ROM Flasher #
+echo ###################################
 
 :: Set partition variables
 set boot_partitions=boot dtbo init_boot recovery vendor_boot
 set vbmeta_partitions=vbmeta vbmeta_system vbmeta_vendor
-set firmware_partitions=abl aop aop_config bluetooth cpucp cpucp_dtb devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem pvmfw qupfw shrm tz uefi uefisecapp xbl xbl_config xbl_ramdump
+set firmware_partitions=abl aop aop_config bluetooth cpucp cpucp_dtb devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti pvmfw qupfw shrm soccp_dcd soccp_debug tz uefi uefisecapp xbl xbl_config xbl_ramdump
 set logical_partitions=odm product system system_ext vendor
 set dlkm_partitions=system_dlkm vendor_dlkm
 set junk_logical_partitions=null
