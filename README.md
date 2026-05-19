@@ -23,18 +23,19 @@
 - **Phone (2a) & (2a) Plus**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/pacman/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/pacman/bash/flash_all.sh)
 - **Phone (3a) & (3a) Pro**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/asteroids/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/asteroids/bash/flash_all.sh)
 - **Phone (3)**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/metroid/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/metroid/bash/flash_all.sh) 
+- **Phone (3a) Lite**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/bash/flash_all.sh) | [Termux](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/bash/flash_all_termux.sh)
 - **Phone (4a)**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/frogger/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/frogger/bash/flash_all.sh) 
 - **Phone (4a) Pro**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/froggerpro/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/froggerpro/bash/flash_all.sh)
 
 ### 🔴 CMF by Nothing  
-- **Phone (1) & Phone (2) Pro**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/bash/flash_all.sh)
+- **Phone (1) & Phone (2) Pro**: [Windows](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/Windows/flash_all.bat) | [Bash](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/bash/flash_all.sh) | [Termux](https://github.com/spike0en/nothing_fastboot_flasher/blob/galaga-tetris/bash/flash_all_termux.sh)
 
 ---
 
 ## Usage ⚙️:
 
 - The scripts are supported on Bash and Windows 10+ platforms.
-- Refer to [this guide](https://github.com/spike0en/nothing_archive?tab=readme-ov-file#flashing-the-stock-rom-using-fastboot-) for preparing the flashing folder with the respective stock firmware images and run the flashing script for your respective platform.
+- Refer to [this guide](https://spike0en.github.io/nothing_archive/docs/guides#flashing-stock-rom-unbrick--downgrade) for preparing the flashing folder with the respective stock firmware images and run the flashing script for your respective platform.
 - Alternatively, users can dump the `payload.bin` using [payload_dumper_go](https://github.com/ssut/payload-dumper-go) by unpacking a full stock firmware zip and then place the script suited to your operating system in the directory where the `*.img` files from `payload.bin` have been extracted. Finally, reboot your device to the bootloader and then run the flashing script.
 - The script can be executed by double-clicking the `flash_all.bat` file on Windows or by running the following command in a terminal on a bash-supported operating system (after navigating to the directory where the `*.img` files from `payload.bin` have been extracted):
 
@@ -72,6 +73,7 @@
 - [arter97](https://github.com/arter97/Pong_fastboot_flasher)
 - [AntoninoScordino](https://github.com/nothing-Pacman/flashtool)
 - [Phatwalrus](https://github.com/PHATWalrus)
+- [sid_imp](https://github.com/devvsid)
 - [XelXen](https://github.com/XelXen)
 
 ---
