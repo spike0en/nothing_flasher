@@ -573,7 +573,7 @@ for %%i in (%logical_partitions%) do (
     for %%s in (a b) do (
         call :DeleteLogicalPartition %%i_%%s-cow
         call :DeleteLogicalPartition %%i_%%s
-        call :CreateLogicalPartition %%i_%%s, 1
+        call :CreateLogicalPartition %%i_%%s 1
     )
 )
 exit /b
