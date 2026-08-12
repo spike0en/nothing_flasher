@@ -428,8 +428,9 @@ if %errorlevel% neq 0 (
         :: In rare cases, if tar also fails, guide the user to do it manually
         echo Extraction using tar has failed.
         echo Please download the platform-tools from the link below:
-        echo https://developer.android.com/tools/releases/platform-tools
-        echo Then, extract the ZIP into the same directory as this script.
+        echo Link: https://developer.android.com/tools/releases/platform-tools
+        echo Then, extract it manually to the following directory structure:
+        echo .\platform-tools\ (in the same directory as this script)
         echo
         exit /b 1
     )
