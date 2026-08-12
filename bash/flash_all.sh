@@ -28,11 +28,17 @@ PlatformToolsSetup() {
     echo "#############################"
     echo "# SETTING UP PLATFORM TOOLS #"
     echo "#############################"
-    if [[ ! -d "platform-tools-latest" ]]; then
+    if [[ ! -d "platform-tools" ]]; then
         echo "Platform tools not found. Downloading..."
-        if curl --fail --location https://dl.google.com/android/repository/platform-tools-latest-$(uname).zip -o platform-tools-latest.zip; then
+        local fastboot_dl
+        if [[ $OSTYPE == 'darwin'* ]]; then
+            fastboot_dl="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip"
+        else
+            fastboot_dl="https://dl.google.com/android/repository/platform-tools-latest-linux.zip"
+        fi
+        if curl --fail --location "$fastboot_dl" -o platform-tools-latest.zip; then
             echo "Platform tools downloaded successfully."
-            UnZipFile "platform-tools-latest.zip" "platform-tools-latest"
+            UnZipFile "platform-tools-latest.zip" "."
             echo "Platform tools extracted successfully."
             rm -f platform-tools-latest.zip
         else
@@ -48,7 +54,7 @@ FastbootValidation() {
     echo "###############################"
     echo "# CHECKING FASTBOOT EXECUTABLE #"
     echo "###############################"
-    fastboot="./platform-tools-latest/platform-tools/fastboot"
+    fastboot="./platform-tools/fastboot"
 
     if [[ ! -f "$fastboot" ]]; then
         echo "[ERROR] Fastboot executable not found at '$fastboot'."

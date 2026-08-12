@@ -404,14 +404,14 @@ exit /b 0
 echo #############################
 echo # SETTING UP PLATFORM TOOLS #
 echo #############################
-if not exist platform-tools-latest (
+if not exist platform-tools (
     echo Platform tools not found. Downloading...
-    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools-latest-windows.zip -o platform-tools-latest.zip
-    if exist platform-tools-latest.zip (
+    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools-latest-windows.zip -o platform-tools-latest-windows.zip
+    if exist platform-tools-latest-windows.zip (
         echo Platform tools downloaded successfully.
-        call :UnZipFile "%~dp0platform-tools-latest.zip" "%~dp0platform-tools-latest"
+        call :UnZipFile "%~dp0platform-tools-latest-windows.zip" "%~dp0"
         echo Platform tools extracted successfully.
-        del /f /q platform-tools-latest.zip
+        del /f /q platform-tools-latest-windows.zip
     ) else (
         echo Error: Failed to download platform tools.
         exit /b 1
@@ -425,7 +425,7 @@ exit /b
 echo ################################
 echo # CHECKING FASTBOOT EXECUTABLE # 
 echo ################################
-set "fastboot=.\platform-tools-latest\platform-tools\fastboot.exe"
+set "fastboot=.\platform-tools\fastboot.exe"
 
 :: Ensure fastboot.exe exists
 if not exist "%fastboot%" (
@@ -455,11 +455,6 @@ if %errorlevel% neq 0 (
     echo Extraction using PowerShell has failed, trying with tar...
 
     :: Try to extract using tar
-    if exist "%~2" (
-        echo Directory "%~2" exists, removing it...
-        rmdir /s /q "%~2"
-    )
-    mkdir "%~2"
     tar -xf "%~1" -C "%~2"
     if %errorlevel% neq 0 (
         :: In rare cases, if tar also fails, guide the user to do it manually
@@ -467,7 +462,7 @@ if %errorlevel% neq 0 (
         echo Please download the platform-tools from the link below:
         echo Link: https://developer.android.com/tools/releases/platform-tools
         echo Then, extract it manually to the following directory structure:
-        echo .\platform-tools-latest\platform-tools\ (in the same directory as this script)
+        echo .\platform-tools\ (in the same directory as this script)
         echo
         exit /b 1
     )
