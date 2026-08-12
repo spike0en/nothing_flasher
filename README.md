@@ -58,9 +58,8 @@
 - If the `platform-tools` download or unzip process fails, or if `fastboot.exe` is not executable despite following the above steps, manually download the latest version from [here](https://developer.android.com/tools/releases/platform-tools). Unzip it into the same directory as the script, ensuring the following structure:
 
   ```bash
-  ├── platform-tools-latest/
-  │   ├── platform-tools/
-  │   │   ├── ...binaries
+  ├── platform-tools/
+  │   ├── ...binaries
   ├── flashing script (flash_all.bat / flash_all.sh)
   └── Required stock firmware image files
   ```
