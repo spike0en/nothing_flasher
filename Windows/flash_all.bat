@@ -195,6 +195,7 @@ if not exist super.img (
 echo ####################################
 echo # FLASHING OTHER VBMETA PARTITIONS #
 echo ####################################
+call :RebootBootloader
 for %%i in (%vbmeta_partitions%) do (
     if %disable_avb% equ 1 (
         call :FlashImage "%%i --disable-verity --disable-verification", %%i.img

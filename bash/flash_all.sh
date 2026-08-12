@@ -234,6 +234,7 @@ fi
 echo "####################################"
 echo "# FLASHING OTHER VBMETA PARTITIONS #"
 echo "####################################"
+RebootBootloader
 for i in $vbmeta_partitions; do
     case "$VBMETA_RESP" in
         [yY] )
