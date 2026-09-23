@@ -48,13 +48,6 @@ function SetActiveSlot {
     fi
 }
 
-function SwapSlot {
-    if ! "$fastboot" --set-active=${INACTIVE_SLOT}; then
-        echo "Error occured while switching to inactive slot. Aborting"
-        exit 1
-    fi
-}
-
 function handle_fastboot_error { 
     case "$FASTBOOT_ERROR" in
         [nN] )
@@ -149,14 +142,27 @@ function isFastbootD {
 }
 
 function GetSlot {
-    ACTIVE_SLOT=$("$fastboot" getvar current-slot 2>&1 | head -n1 | rev | cut -c1)
-    if [ -z "$ACTIVE_SLOT" ]; then 
-        echo active slot not set! Aborting...
+    local raw
+    raw=$("$fastboot" getvar current-slot 2>&1 | grep -m1 'current-slot:' \
+          | sed 's/.*current-slot:[[:space:]]*//' | tr -d '[:space:]_')
+    case "$raw" in
+        a) ACTIVE_SLOT=a; INACTIVE_SLOT=b ;;
+        b) ACTIVE_SLOT=b; INACTIVE_SLOT=a ;;
+        *) echo "Could not determine active slot (got '$raw'). Aborting."; exit 1 ;;
+    esac
+    echo "Active slot: $ACTIVE_SLOT | Inactive slot: $INACTIVE_SLOT"
+}
+
+function SwapSlot {
+    local before=$ACTIVE_SLOT
+    if ! "$fastboot" --set-active=other; then
+        echo "Error occurred while switching slots. Aborting"
+        exit 1
     fi
-    if [ "$ACTIVE_SLOT" = "a" ]; then 
-        INACTIVE_SLOT="b"
-    else 
-        INACTIVE_SLOT="a"
+    GetSlot
+    if [ "$ACTIVE_SLOT" = "$before" ]; then
+        echo "Slot did not change after --set-active=other. Aborting"
+        exit 1
     fi
 }
 
