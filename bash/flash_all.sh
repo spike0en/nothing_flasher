@@ -166,13 +166,6 @@ case "$DATA_RESP" in
         ;;
 esac
 
-echo "############################"
-echo "# FLASHING BOOT PARTITIONS #"
-echo "############################"
-for i in $boot_partitions; do
-    FlashImage "${i}_${slot}" \ "$i.img"
-done
-
 echo "###################"
 echo "# FLASHING VBMETA #"
 echo "###################"
@@ -185,6 +178,13 @@ case "$VBMETA_RESP" in
         FlashImage "vbmeta_${slot}" \ "vbmeta.img"
         ;;
 esac
+
+echo "############################"
+echo "# FLASHING BOOT PARTITIONS #"
+echo "############################"
+for i in $boot_partitions; do
+    FlashImage "${i}_${slot}" \ "$i.img"
+done
 
 echo "###############################"
 echo "# FLASHING LOGICAL PARTITIONS #"

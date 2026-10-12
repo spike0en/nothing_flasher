@@ -39,7 +39,7 @@ echo #############################
 echo #########################
 echo # CHECKING CURRENT SLOT #
 echo #########################
-for /f "tokens=2" %%A in ('fastboot getvar current-slot 2^>^&1 ^| findstr /b "current-slot:"') do set "current_slot=%%A"
+for /f "tokens=2 delims=: " %%i in ('%fastboot% getvar current-slot 2^>^&1 ^| findstr /b /c:"current-slot:"') do set "current_slot=%%i"
 if %current_slot% == a (
     set slot=b
 ) else if %current_slot% == b (
@@ -62,13 +62,6 @@ if %errorlevel% equ 1 (
     call :WipeData
 )
 
-echo ############################
-echo # FLASHING BOOT PARTITIONS #
-echo ############################
-for %%i in (%boot_partitions%) do (
-    call :FlashImage "%%i_%slot%", %%i.img
-)
-
 echo ###################
 echo # FLASHING VBMETA #
 echo ###################
@@ -78,6 +71,13 @@ if %disable_avb% equ 1 (
     call :FlashImage "vbmeta_%slot% --disable-verity --disable-verification", vbmeta.img
 ) else (
     call :FlashImage "vbmeta_%slot%", vbmeta.img
+)
+
+echo ############################
+echo # FLASHING BOOT PARTITIONS #
+echo ############################
+for %%i in (%boot_partitions%) do (
+    call :FlashImage "%%i_%slot%", %%i.img
 )
 
 echo ###############################
