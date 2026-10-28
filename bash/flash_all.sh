@@ -1,10 +1,56 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: Hellboy017, spike0en
+# SPDX-License-Identifier: MIT
 
 echo "################################"
 echo "# Metroid Fastboot ROM Flasher #"
 echo "################################"
 
 ##----------------------------------------------------------##
+read_choice() {
+    local prompt_msg="$1"
+    local choice_var
+    while true; do
+        read -rp "$prompt_msg [Y/n]: " choice_var
+        case "$choice_var" in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            "" ) return 0;;
+            * ) echo "Please answer yes (y) or no (n).";;
+        esac
+    done
+}
+
+echo "############################"
+echo "#  PRE-REQUIREMENTS CHECK  #"
+echo "############################"
+
+if ! read_choice "Is your device bootloader unlocked?"; then
+    echo "To use this script, your device bootloader must be unlocked."
+    echo "Please unlock it before proceeding."
+    read -rp "Press Enter to exit..."
+    exit 1
+fi
+
+if ! read_choice "Are you in bootloader mode (fastboot)?"; then
+    echo "Ensure your device is in bootloader mode before proceeding."
+    echo "You can enter bootloader mode by holding Power + Volume Down or using:"
+    echo "adb reboot bootloader"
+    read -rp "Press Enter to exit..."
+    exit 1
+fi
+
+if ! read_choice "Are fastboot drivers/udev rules properly installed/configured?"; then
+    echo "Please install/configure the proper fastboot drivers/rules before proceeding."
+    echo "For Linux, ensure you have appropriate udev rules set up."
+    echo "See: https://developer.android.com/studio/run/device#setting-up-udev"
+    read -rp "Press Enter to exit..."
+    exit 1
+fi
+
+echo "All pre-requirements met! Proceeding..."
+echo
+
 if [ ! -d "$(pwd)/platform-tools" ]; then
     if [[ $OSTYPE == 'darwin'* ]]; then
         fastboot_dl="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip"
@@ -12,11 +58,19 @@ if [ ! -d "$(pwd)/platform-tools" ]; then
         fastboot_dl="https://dl.google.com/android/repository/platform-tools-latest-linux.zip"
     fi
     curl -L "$fastboot_dl" -o "$(pwd)/platform-tools-latest.zip"
-    unzip "$(pwd)/platform-tools-latest.zip"
-    rm "$(pwd)/platform-tools-latest.zip"
+    if command -v unzip >/dev/null 2>&1; then
+        unzip -o "$(pwd)/platform-tools-latest.zip" -d "$(pwd)"
+    else
+        tar -xf "$(pwd)/platform-tools-latest.zip" -C "$(pwd)"
+    fi
+    rm -f "$(pwd)/platform-tools-latest.zip"
 fi
 
 fastboot="$(pwd)/platform-tools/fastboot"
+
+if [ -f "$fastboot" ] && [ ! -x "$fastboot" ]; then
+    chmod +x "$fastboot" 2>/dev/null
+fi
 
 if [ ! -f "$fastboot" ] || [ ! -x "$fastboot" ]; then
     echo "Fastboot cannot be executed, exiting"

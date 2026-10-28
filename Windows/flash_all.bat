@@ -1,3 +1,6 @@
+:: SPDX-FileCopyrightText: Hellboy017, spike0en
+:: SPDX-License-Identifier: MIT
+
 @echo off
 title Nothing Phone 3 Fastboot ROM Flasher
 
@@ -7,19 +10,64 @@ echo ################################
 
 cd %~dp0
 
-if not exist platform-tools-latest (
-    echo Downloading latest platform drivers...
-    Call :GetFile "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" , "%~dp0platform-tools-latest.zip"
-    Call :UnZipFile "%~dp0platform-tools-latest", "%~dp0platform-tools-latest.zip"
-    del /f /q platform-tools-latest.zip
+echo ############################
+echo #  PRE-REQUIREMENTS CHECK  #
+echo ############################
+
+:: Check 1: Is bootloader unlocked?
+choice /m "Is your device bootloader unlocked?"
+if %errorlevel% equ 2 (
+    echo To use this script, your device bootloader must be unlocked.
+    echo Please unlock it before proceeding.
+    pause
+    exit /b 1
 )
 
-set fastboot=.\platform-tools-latest\platform-tools\fastboot.exe
-if not exist %fastboot% (
-    echo Fastboot cannot be executed. Aborting
+:: Check 2: Is the device in bootloader mode?
+choice /m "Are you in bootloader mode?"
+if %errorlevel% equ 2 (
+    echo Ensure your device is in bootloader mode before proceeding.
+    echo You can enter bootloader mode by holding Power + Volume Down and releasing the Power Key when the OEM logo appears or by using:
+    echo adb reboot bootloader
     pause
-    exit
+    exit /b 1
 )
+
+:: Check 3: Are fastboot drivers installed?
+choice /m "Are your fastboot drivers properly installed? (Can you see 'Android Bootloader Interface' in Device Manager?)"
+if %errorlevel% equ 2 (
+    echo Please install the proper fastboot drivers before proceeding.
+    echo Install the latest Google USB Drivers from https://developer.android.com/studio/run/win-usb
+    pause
+    exit /b 1
+)
+
+echo All pre-requirements met! Proceeding...
+
+:: -------------------------------------
+::  FILE INTEGRITY CHECKS [RECOMMENDED]
+:: -------------------------------------
+call :PreHashVerificationPrompt
+if %errorlevel% equ 0 (
+    call :VerifyImageHashes
+    if %errorlevel% neq 0 (
+        echo [ABORTED] Image validation failed or canceled by user.
+        pause
+        exit /b 1
+    )
+) else (
+    echo [INFO] Skipping hash verification as requested. Proceeding without validation...
+)
+
+:: ----------------------------------
+::  PLATFORM TOOLS SETUP & VALIDATION
+:: ----------------------------------
+
+:: Setup platform-tools
+call :PlatformToolsSetup
+
+:: Validate fastboot existence
+call :FastbootValidation
 
 set boot_partitions=boot init_boot vendor_boot dtbo recovery
 set firmware_partitions=abl aop aop_config bluetooth cpucp cpucp_dtb devcfg dsp featenabler hyp imagefv keymaster modem multiimgoem multiimgqti pvmfw qupfw shrm soccp_dcd soccp_debug tz uefi uefisecapp xbl xbl_config xbl_ramdump
@@ -149,42 +197,248 @@ echo Stock firmware restored.
 pause
 exit
 
-:GetFile
-set "dwn=%temp%\download.vbs"
-if exist "%dwn%" del /f /q "%dwn%"
+:PreHashVerificationPrompt
+echo.
+echo #########################
+echo # IMAGE INTEGRITY CHECK #
+echo #########################
+echo This step verifies file integrity and detects missing or corrupted images before flashing.
+echo.
+echo Download the provided .sha256 checksum file in release assets
+echo From: https://github.com/spike0en/nothing_archive/releases
+echo Move the same to: %CD%
+echo Example: Pong_V3.2-250708-2227-hash.sha256
+echo Filenames can vary based on NOS build and device model
+echo.
+choice /m "Begin (Y) or skip hash (N) verification"
+if %errorlevel% equ 1 (
+    exit /b 0
+) else (
+    exit /b 1
+)
 
->%dwn% echo strUrl = "%~1"
->>%dwn% echo strFile = "%~2"
->>%dwn% echo Set Post = CreateObject("MSXML2.XMLHTTP")
->>%dwn% echo Post.open "GET", strUrl, False
->>%dwn% echo Post.send
->>%dwn% echo Set aGet = CreateObject("ADODB.Stream")
->>%dwn% echo aGet.Type = 1
->>%dwn% echo aGet.Open
->>%dwn% echo aGet.Write Post.responseBody
->>%dwn% echo aGet.SaveToFile strFile, 2
->>%dwn% echo aGet.Close
+:VerifyImageHashes
+setlocal enabledelayedexpansion
 
-cscript //nologo "%dwn%" >nul 2>&1
-if exist "%dwn%" del /f /q "%dwn%"
+:CheckForSha
+dir /b *.sha256 >nul 2>&1
+if errorlevel 1 (
+    echo.
+    echo =================================================================
+    echo [WARNING] No .sha256 checksum files found in the directory!
+    echo =================================================================
+    choice /m "Do you want to proceed without hash verification?" /c YN
+
+    rem IMPORTANT: In CHOICE, Y = errorlevel 1, N = errorlevel 2
+    if errorlevel 2 (
+        echo.
+        echo [INFO] Please place the required .sha256 checksum files in:
+        echo   %CD%
+        echo and then press any key to retry...
+        pause >nul
+        goto :CheckForSha
+    )
+    if errorlevel 1 (
+        echo Proceeding without hash verification...
+        endlocal
+        exit /b 0
+    )
+)
+
+set /a total=0
+set /a valid=0
+set /a invalid=0
+set /a missing=0
+set "invalidList="
+set "missingList="
+
+echo.
+echo ===============================
+echo Checking Image Hashes...
+echo ===============================
+
+for %%F in (*.sha256) do (
+    echo Checking: %%F
+    echo ------------------------------------------
+
+    for /f "usebackq delims=" %%L in ("%%F") do (
+        set "line=%%L"
+        if not "!line!"=="" (
+            set "hash="
+            set "file="
+            for /f "tokens=1" %%H in ("!line!") do (
+                set "hash=%%H"
+            )
+            set "file=!line:* *=!"
+            set "hash=!hash: =!"
+            set "hash=!hash:~0,64!"
+
+            set /a total+=1
+
+            if exist "!file!" (
+                set "actual="
+                for /f "tokens=1" %%X in ('CertUtil -hashfile "!file!" SHA256 ^| find /i /v "SHA256" ^| find /i /v "CertUtil"') do (
+                    set "actual=%%X"
+                )
+                set "actual=!actual: =!"
+                set "actual=!actual:~0,64!"
+
+                if /i "!hash!"=="!actual!" (
+                    echo [VALID]     !file!
+                    set /a valid+=1
+                ) else (
+                    echo [INVALID]   !file!
+                    set /a invalid+=1
+                    set "invalidList=!invalidList!!file!;"
+                )
+            ) else (
+                echo [MISSING]   !file!
+                set /a missing+=1
+                set "missingList=!missingList!!file!;"
+            )
+        )
+    )
+)
+
+echo ------------------------------------------
+echo.
+echo Final Results
+echo ==============================
+echo Total .img files    = !total!
+echo Valid images        = !valid!
+echo Invalid images      = !invalid!
+echo Missing images      = !missing!
+echo.
+
+if !invalid! GTR 0 (
+    echo List of Invalid Images:
+    set /a count=0
+    for %%I in (!invalidList!) do (
+        set /a count+=1
+        echo   !count!. %%I
+    )
+    echo.
+)
+
+if !missing! GTR 0 (
+    echo List of Missing Images:
+    set /a count=0
+    for %%M in (!missingList!) do (
+        set /a count+=1
+        echo   !count!. %%M
+    )
+    echo.
+)
+
+if !invalid! GTR 0 (
+    echo [WARNING] One or more image files are invalid.
+)
+if !missing! GTR 0 (
+    echo [WARNING] One or more image files are missing.
+)
+
+if !invalid! GTR 0 goto :ConfirmProceed
+if !missing! GTR 0 goto :ConfirmProceed
+
+echo All image files validated successfully.
+endlocal
+exit /b 0
+
+:ConfirmProceed
+choice /m "Some files are invalid or missing. Do you want to proceed anyway?"
+if %errorlevel% equ 1 (
+    rem User chose Yes → continue
+    endlocal
+    exit /b 0
+)
+
+rem User chose No → show retry/exit menu
+echo.
+echo ====================================================
+echo [INFO] Choose an option:
+echo   1. Retry validation (after fixing files)
+echo   2. Exit flasher
+echo ====================================================
+set /p choice="Enter 1 or 2: "
+
+if "%choice%"=="1" (
+    echo [INFO] Retrying validation...
+    endlocal
+    goto :VerifyImageHashes
+) else (
+    echo [ABORTED] Image validation failed or canceled by user.
+    endlocal
+    exit /b 1
+)
+exit /b 0
+
+:PlatformToolsSetup
+echo #############################
+echo # SETTING UP PLATFORM TOOLS #
+echo #############################
+if not exist platform-tools (
+    echo Platform tools not found. Downloading...
+    curl --ssl-no-revoke -L https://dl.google.com/android/repository/platform-tools-latest-windows.zip -o platform-tools-latest-windows.zip
+    if exist platform-tools-latest-windows.zip (
+        echo Platform tools downloaded successfully.
+        call :UnZipFile "%~dp0platform-tools-latest-windows.zip" "%~dp0"
+        echo Platform tools extracted successfully.
+        del /f /q platform-tools-latest-windows.zip
+    ) else (
+        echo Error: Failed to download platform tools.
+        exit /b 1
+    )
+) else (
+    echo Platform tools already exist. Skipping download...
+)
+exit /b
+
+:FastbootValidation
+echo ################################
+echo # CHECKING FASTBOOT EXECUTABLE # 
+echo ################################
+set "fastboot=.\platform-tools\fastboot.exe"
+
+:: Ensure fastboot.exe exists
+if not exist "%fastboot%" (
+    echo [ERROR] Fastboot executable not found.
+    echo Please ensure platform tools are properly downloaded.
+    pause
+    exit /b 1
+)
+
+:: Ensure fastboot is executable and prints version
+%fastboot% --version
+if %errorlevel% neq 0 (
+    echo [ERROR] Fastboot executable is not functioning properly.
+    echo Try running "fastboot --version" manually.
+    pause
+    exit /b 1
+)
+
+echo [SUCCESS] Fastboot executable found and verified.
 exit /b
 
 :UnZipFile
-set "uzp=%temp%\unzip.vbs"
-if exist "%uzp%" del /f /q "%uzp%"
+:: Try to extract using PowerShell
+powershell -Command "Expand-Archive -Path '%~1' -DestinationPath '%~2' -Force"
+if %errorlevel% neq 0 (
+    :: If PowerShell fails, display message and prepare to use tar
+    echo Extraction using PowerShell has failed, trying with tar...
 
->%uzp%  echo Set fso = CreateObject("Scripting.FileSystemObject")
->>%uzp% echo If NOT fso.FolderExists(fso.GetAbsolutePathName("%~1")) Then
->>%uzp% echo     fso.CreateFolder(fso.GetAbsolutePathName("%~1"))
->>%uzp% echo End If
->>%uzp% echo Set objShell = CreateObject("Shell.Application")
->>%uzp% echo Set FilesInZip = objShell.NameSpace(fso.GetAbsolutePathName("%~2")).Items
->>%uzp% echo objShell.NameSpace(fso.GetAbsolutePathName("%~1")).CopyHere FilesInZip
->>%uzp% echo Set fso = Nothing
->>%uzp% echo Set objShell = Nothing
-
-cscript //nologo "%uzp%" >nul 2>&1
-if exist "%uzp%" del /f /q "%uzp%"
+    :: Try to extract using tar
+    tar -xf "%~1" -C "%~2"
+    if %errorlevel% neq 0 (
+        :: In rare cases, if tar also fails, guide the user to do it manually
+        echo Extraction using tar has failed.
+        echo Please download the platform-tools from the link below:
+        echo Link: https://developer.android.com/tools/releases/platform-tools
+        echo Then, extract it manually to the following directory structure:
+        echo .\platform-tools\ (in the same directory as this script)
+        echo.
+        exit /b 1
+    )
+)
 exit /b
 
 :SetActiveSlot
