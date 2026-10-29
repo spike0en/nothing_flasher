@@ -195,7 +195,8 @@ echo "#############################"
 echo "#########################"
 echo "# CHECKING CURRENT SLOT #"
 echo "#########################"
-current_slot=$(fastboot getvar current-slot 2>&1 | sed -n 's/^current-slot: \([ab]\)$/\1/p')
+#current_slot=$(fastboot getvar current-slot 2>&1 | sed -n 's/^current-slot: \([ab]\)$/\1/p')
+current_slot=$("$fastboot" getvar current-slot 2>&1 | sed -n 's/^current-slot: \([ab]\)$/\1/p')
 case "$current_slot" in
     a) slot="b" ;;
     b) slot="a" ;;
